@@ -1,0 +1,992 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db;">
+    <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📊 Download All R&D Publications</h4>
+    
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <a href="/download_all_publications/{{ faculty.id }}" 
+           class="btn" 
+           style="background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-flex; align-items: center; gap: 8px; font-weight: bold;">
+            📥 Download All Publications
+        </a>
+        
+        <div style="font-size: 13px; color: #7f8c8d;">
+            <strong>Includes:</strong> Journals + Conference Papers + Book Chapters + Patents
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>🔬 R&D Publications - {{ faculty.name_ssc }}</h2>
+    <div style="display: flex; gap: 10px;">
+        <a href="/faculty/{{ faculty.id }}" class="btn" style="background: #3498db;">← Back to Profile</a>
+    </div>
+</div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs" style="margin-bottom: 30px;">
+        <button class="tab-button active" onclick="openTab('journals')">📚 Journal Publications</button>
+        <button class="tab-button" onclick="openTab('conferences')">🎤 Conference Papers</button>
+        <button class="tab-button" onclick="openTab('book-chapters')">📖 Book Chapters</button>
+        <button class="tab-button" onclick="openTab('patents')">⚖️ Patents</button>
+    </div>
+
+        <!-- Journal Publications Tab -->
+    <div id="journals" class="tab-content active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Journal Publications</h3>
+            <div style="display: flex; gap: 10px;">
+                {% if can_edit %}
+                <button class="btn" style="background: #27ae60;" onclick="showAddForm('journal')">+ Add Journal Publication</button>
+                {% endif %}
+                <!-- ADD DOWNLOAD BUTTON -->
+                <a href="/download_journals/{{ faculty.id }}" class="btn" style="background: #9b59b6;">📊 Download Excel</a>
+            </div>
+        </div>
+
+        <!-- Add Journal Form (Hidden by Default) -->
+        <div id="journal-form" class="add-form" style="display: none;">
+            <h4>Add New Journal Publication</h4>
+            <form method="POST" action="/add_journal_publication/{{ faculty.id }}" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Department:*</label>
+                        <select name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CIVIL">CIVIL</option>
+                            <option value="EEE">EEE</option>
+                            <option value="MECH">MECH</option>
+                            <option value="ECE">ECE</option>
+                            <option value="CSE">CSE</option>
+                            <option value="CSE-AI">CSE-AI</option>
+                            <option value="CSE-DS">CSE-DS</option>
+                            <option value="CSE-AI&ML">CSE-AI&ML</option>
+                            <option value="CSE-CS">CSE-CS</option>
+                            <option value="IT">IT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>First Author:*</label>
+                        <input type="text" name="first_author" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Corresponding Author:*</label>
+                        <input type="text" name="corresponding_author" required>
+                    </div>
+                    <div>
+                        <label>Faculty Author Position:*</label>
+                        <select name="faculty_author_position" required>
+                            <option value="">Select Position</option>
+                            <option value="First Author">First Author</option>
+                            <option value="Second Author">Second Author</option>
+                            <option value="Corresponding Author">Corresponding Author</option>
+                            <option value="Co-author">Co-author</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label>Other Authors:</label>
+                    <textarea name="other_authors" placeholder="Enter other authors separated by commas"></textarea>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label>Journal Paper (APA format):*</label>
+                    <textarea name="paper_title_apa" required placeholder="Enter paper title in APA format"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Journal Name:*</label>
+                        <input type="text" name="journal_name" required>
+                    </div>
+                    <div>
+                        <label>Volume & Issue:</label>
+                        <input type="text" name="volume_issue" placeholder="e.g., Vol. 12, Issue 3">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Page Numbers:</label>
+                        <input type="text" name="page_numbers" placeholder="e.g., 123-135">
+                    </div>
+                    <div>
+                        <label>ISSN Number:</label>
+                        <input type="text" name="issn_number">
+                    </div>
+                    <div>
+                        <label>DOI:</label>
+                        <input type="text" name="doi">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Year of Publication:*</label>
+                        <input type="number" name="year_of_publication" min="1900" max="2030" required>
+                    </div>
+                    <div>
+                        <label>Indexing:</label>
+                        <select name="indexing">
+                            <option value="">Select Indexing</option>
+                            <option value="Scopus">Scopus</option>
+                            <option value="SCI">SCI</option>
+                            <option value="SCIE">SCIE</option>
+                            <option value="WoS">Web of Science</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Quartile:</label>
+                        <select name="quartile">
+                            <option value="">Select Quartile</option>
+                            <option value="Q1">Q1</option>
+                            <option value="Q2">Q2</option>
+                            <option value="Q3">Q3</option>
+                            <option value="Q4">Q4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Impact Factor:</label>
+                        <input type="number" name="impact_factor" step="0.001" placeholder="0.000">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Journal Link:</label>
+                        <input type="url" name="journal_link" placeholder="https://">
+                    </div>
+                    <div>
+                        <label>Publisher:</label>
+                        <input type="text" name="publisher">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Funding Agency:</label>
+                        <input type="text" name="funding_agency">
+                    </div>
+                    <div>
+                        <label>Remarks:</label>
+                        <input type="text" name="remarks">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn" style="background: #27ae60;">Add Publication</button>
+                    <button type="button" class="btn" style="background: #95a5a6;" onclick="hideAddForm('journal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Journal Publications List -->
+        {% if journals %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Journal Paper</th>
+                        <th>Journal Name</th>
+                        <th>Authors</th>
+                        <th>Year</th>
+                        <th>Indexing</th>
+                        <th>Impact Factor</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for journal in journals %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ journal.paper_title_apa[:100] }}{% if journal.paper_title_apa|length > 100 %}...{% endif %}</strong>
+                            {% if journal.doi %}
+                            <br><small>DOI: {{ journal.doi }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ journal.journal_name }}</td>
+                        <td>
+                            {{ journal.first_author }}
+                            {% if journal.other_authors %}
+                            <br><small>+ {{ journal.other_authors.split(',')|length }} co-authors</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ journal.year_of_publication }}</td>
+                        <td>
+                            {% if journal.indexing %}
+                            <span class="badge">{{ journal.indexing }}</span>
+                            {% endif %}
+                            {% if journal.quartile %}
+                            <span class="badge">{{ journal.quartile }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if journal.impact_factor and journal.impact_factor > 0 %}
+                            <span class="badge">{{ "%.3f"|format(journal.impact_factor) }}</span>
+                            {% else %}
+                            <span class="badge">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-small view-btn" onclick="viewJournal({{ journal.id }})">View</button>
+                                {% if can_edit %}
+<button class="btn-small edit-btn" onclick="editJournal({{ journal.id }})">Edit</button>
+<a href="/delete_journal/{{ journal.id }}" class="btn-small delete-btn">Delete</a>
+{% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #7f8c8d;">No Journal Publications Added Yet</h4>
+            <p style="color: #95a5a6;">Start by adding your first journal publication.</p>
+        </div>
+        {% endif %}
+    </div>
+
+        <!-- Conference Papers Tab -->
+    <div id="conferences" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Conference Publications</h3>
+            <div style="display: flex; gap: 10px;">
+                {% if can_edit %}
+                <button class="btn" style="background: #27ae60;" onclick="showAddForm('conference')">+ Add Conference Paper</button>
+                {% endif %}
+                <!-- ADD DOWNLOAD BUTTON -->
+                <a href="/download_conferences/{{ faculty.id }}" class="btn" style="background: #9b59b6;">📊 Download Excel</a>
+            </div>
+        </div>
+
+        <!-- Add Conference Form -->
+        <div id="conference-form" class="add-form" style="display: none;">
+            <h4>Add New Conference Publication</h4>
+            <form method="POST" action="/add_conference_publication/{{ faculty.id }}" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Department:*</label>
+                        <select name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CIVIL">CIVIL</option>
+                            <option value="EEE">EEE</option>
+                            <option value="MECH">MECH</option>
+                            <option value="ECE">ECE</option>
+                            <option value="CSE">CSE</option>
+                            <option value="CSE-AI">CSE-AI</option>
+                            <option value="CSE-DS">CSE-DS</option>
+                            <option value="CSE-AI&ML">CSE-AI&ML</option>
+                            <option value="CSE-CS">CSE-CS</option>
+                            <option value="IT">IT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Paper Title:*</label>
+                        <input type="text" name="paper_title" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Authors:*</label>
+                        <textarea name="authors" required placeholder="Enter all authors separated by commas"></textarea>
+                    </div>
+                    <div>
+                        <label>Corresponding Author:*</label>
+                        <input type="text" name="corresponding_author" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Faculty Author Position:*</label>
+                        <select name="faculty_author_position" required>
+                            <option value="">Select Position</option>
+                            <option value="First Author">First Author</option>
+                            <option value="Second Author">Second Author</option>
+                            <option value="Corresponding Author">Corresponding Author</option>
+                            <option value="Co-author">Co-author</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Conference Name:*</label>
+                        <input type="text" name="conference_name" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Conference Venue:</label>
+                        <input type="text" name="conference_venue" placeholder="e.g., Virtual, London, etc.">
+                    </div>
+                    <div>
+                        <label>Conference Dates:</label>
+                        <input type="text" name="conference_dates" placeholder="e.g., 15-17 March 2024">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Proceedings Title:</label>
+                        <input type="text" name="proceedings_title">
+                    </div>
+                    <div>
+                        <label>ISBN/ISSN Number:</label>
+                        <input type="text" name="isbn_issn">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>DOI:</label>
+                        <input type="text" name="doi">
+                    </div>
+                    <div>
+                        <label>Year of Publication:*</label>
+                        <input type="number" name="year_of_publication" min="1900" max="2030" required>
+                    </div>
+                    <div>
+                        <label>Indexing:</label>
+                        <select name="indexing">
+                            <option value="">Select Indexing</option>
+                            <option value="Scopus">Scopus</option>
+                            <option value="SCI">SCI</option>
+                            <option value="WoS">Web of Science</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Publisher:</label>
+                        <input type="text" name="publisher">
+                    </div>
+                    <div>
+                        <label>Conference Link:</label>
+                        <input type="url" name="conference_link" placeholder="https://">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn" style="background: #27ae60;">Add Conference Paper</button>
+                    <button type="button" class="btn" style="background: #95a5a6;" onclick="hideAddForm('conference')">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Conference Publications List -->
+        {% if conferences %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Paper Title</th>
+                        <th>Conference Name</th>
+                        <th>Venue & Dates</th>
+                        <th>Year</th>
+                        <th>Indexing</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conference in conferences %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ conference.paper_title[:100] }}{% if conference.paper_title|length > 100 %}...{% endif %}</strong>
+                            {% if conference.doi %}
+                            <br><small>DOI: {{ conference.doi }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ conference.conference_name }}</td>
+                        <td>
+                            {{ conference.conference_venue }}
+                            {% if conference.conference_dates %}
+                            <br><small>{{ conference.conference_dates }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ conference.year_of_publication }}</td>
+                        <td>
+                            {% if conference.indexing %}
+                            <span class="badge">{{ conference.indexing }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-small view-btn" onclick="viewConference({{ conference.id }})">View</button>
+                                {% if can_edit %}
+                                <button class="btn-small edit-btn" onclick="editConference({{ conference.id }})">Edit</button>
+                                <a href="/delete_conference/{{ conference.id }}" class="btn-small delete-btn" onclick="return confirm('Delete this conference paper?')">Delete</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #7f8c8d;">No Conference Publications Added Yet</h4>
+            <p style="color: #95a5a6;">Start by adding your first conference paper.</p>
+        </div>
+        {% endif %}
+    </div>
+
+            <!-- Book Chapters Tab -->
+    <div id="book-chapters" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Book Chapters</h3>
+            <div style="display: flex; gap: 10px;">
+                {% if can_edit %}
+                <button class="btn" style="background: #27ae60;" onclick="showAddForm('book-chapter')">+ Add Book Chapter</button>
+                {% endif %}
+                <!-- ADD DOWNLOAD BUTTON -->
+                <a href="/download_book_chapters/{{ faculty.id }}" class="btn" style="background: #9b59b6;">📊 Download Excel</a>
+            </div>
+        </div>
+
+        <!-- Add Book Chapter Form -->
+        <div id="book-chapter-form" class="add-form" style="display: none;">
+            <h4>Add New Book Chapter</h4>
+            <form method="POST" action="/add_book_chapter/{{ faculty.id }}" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Department:*</label>
+                        <select name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CIVIL">CIVIL</option>
+                            <option value="EEE">EEE</option>
+                            <option value="MECH">MECH</option>
+                            <option value="ECE">ECE</option>
+                            <option value="CSE">CSE</option>
+                            <option value="CSE-AI">CSE-AI</option>
+                            <option value="CSE-DS">CSE-DS</option>
+                            <option value="CSE-AI&ML">CSE-AI&ML</option>
+                            <option value="CSE-CS">CSE-CS</option>
+                            <option value="IT">IT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Chapter Title:*</label>
+                        <input type="text" name="chapter_title" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Book Title:*</label>
+                        <input type="text" name="book_title" required>
+                    </div>
+                    <div>
+                        <label>Authors:*</label>
+                        <textarea name="authors" required placeholder="Enter all authors separated by commas"></textarea>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Faculty Author Position:*</label>
+                        <select name="faculty_author_position" required>
+                            <option value="">Select Position</option>
+                            <option value="First Author">First Author</option>
+                            <option value="Second Author">Second Author</option>
+                            <option value="Corresponding Author">Corresponding Author</option>
+                            <option value="Co-author">Co-author</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Corresponding Author:*</label>
+                        <input type="text" name="corresponding_author" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Publisher:*</label>
+                        <input type="text" name="publisher" required>
+                    </div>
+                    <div>
+                        <label>ISBN Number:</label>
+                        <input type="text" name="isbn_number">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Chapter DOI:</label>
+                        <input type="text" name="chapter_doi">
+                    </div>
+                    <div>
+                        <label>Year of Publication:*</label>
+                        <input type="number" name="year_of_publication" min="1900" max="2030" required>
+                    </div>
+                    <div>
+                        <label>Indexing:</label>
+                        <select name="indexing">
+                            <option value="">Select Indexing</option>
+                            <option value="Scopus">Scopus</option>
+                            <option value="SCI">SCI</option>
+                            <option value="WoS">Web of Science</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Quartile:</label>
+                        <select name="quartile">
+                            <option value="">Select Quartile</option>
+                            <option value="Q1">Q1</option>
+                            <option value="Q2">Q2</option>
+                            <option value="Q3">Q3</option>
+                            <option value="Q4">Q4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Impact Factor:</label>
+                        <input type="number" name="impact_factor" step="0.001" placeholder="0.000">
+                    </div>
+                    <div>
+                        <label>Chapter Link:</label>
+                        <input type="url" name="chapter_link" placeholder="https://">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn" style="background: #27ae60;">Add Book Chapter</button>
+                    <button type="button" class="btn" style="background: #95a5a6;" onclick="hideAddForm('book-chapter')">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Book Chapters List -->
+        {% if book_chapters %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Chapter Title</th>
+                        <th>Book Title</th>
+                        <th>Authors</th>
+                        <th>Publisher</th>
+                        <th>Year</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chapter in book_chapters %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ chapter.chapter_title[:100] }}{% if chapter.chapter_title|length > 100 %}...{% endif %}</strong>
+                            {% if chapter.chapter_doi %}
+                            <br><small>DOI: {{ chapter.chapter_doi }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ chapter.book_title }}</td>
+                        <td>
+                            {{ chapter.authors[:50] }}{% if chapter.authors|length > 50 %}...{% endif %}
+                        </td>
+                        <td>{{ chapter.publisher }}</td>
+                        <td>{{ chapter.year_of_publication }}</td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-small view-btn" onclick="viewBookChapter({{ chapter.id }})">View</button>
+                                {% if can_edit %}
+                                <button class="btn-small edit-btn" onclick="editBookChapter({{ chapter.id }})">Edit</button>
+                                <a href="/delete_book_chapter/{{ chapter.id }}" class="btn-small delete-btn" onclick="return confirm('Delete this book chapter?')">Delete</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #7f8c8d;">No Book Chapters Added Yet</h4>
+            <p style="color: #95a5a6;">Start by adding your first book chapter.</p>
+        </div>
+        {% endif %}
+    </div>
+
+            <!-- Patents Tab -->
+    <div id="patents" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Patents</h3>
+            <div style="display: flex; gap: 10px;">
+                {% if can_edit %}
+                <button class="btn" style="background: #27ae60;" onclick="showAddForm('patent')">+ Add Patent</button>
+                {% endif %}
+                <!-- ADD DOWNLOAD BUTTON -->
+                <a href="/download_patents/{{ faculty.id }}" class="btn" style="background: #9b59b6;">📊 Download Excel</a>
+            </div>
+        </div>
+        <!-- Add Patent Form -->
+        <div id="patent-form" class="add-form" style="display: none;">
+            <h4>Add New Patent</h4>
+            <form method="POST" action="/add_patent/{{ faculty.id }}" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Department:*</label>
+                        <select name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CIVIL">CIVIL</option>
+                            <option value="EEE">EEE</option>
+                            <option value="MECH">MECH</option>
+                            <option value="ECE">ECE</option>
+                            <option value="CSE">CSE</option>
+                            <option value="CSE-AI">CSE-AI</option>
+                            <option value="CSE-DS">CSE-DS</option>
+                            <option value="CSE-AI&ML">CSE-AI&ML</option>
+                            <option value="CSE-CS">CSE-CS</option>
+                            <option value="IT">IT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Title of the Patent:*</label>
+                        <input type="text" name="patent_title" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Inventors:*</label>
+                        <textarea name="inventors" required placeholder="Enter all inventors separated by commas"></textarea>
+                    </div>
+                    <div>
+                        <label>Corresponding Author/Applicant:*</label>
+                        <input type="text" name="corresponding_applicant" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Faculty Author Position:*</label>
+                        <select name="faculty_author_position" required>
+                            <option value="">Select Position</option>
+                            <option value="First Inventor">First Inventor</option>
+                            <option value="Second Inventor">Second Inventor</option>
+                            <option value="Corresponding Applicant">Corresponding Applicant</option>
+                            <option value="Co-inventor">Co-inventor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Patent Application Number:*</label>
+                        <input type="text" name="patent_application_number" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Date of Filing:</label>
+                        <input type="date" name="filing_date">
+                    </div>
+                    <div>
+                        <label>Date of Publication:</label>
+                        <input type="date" name="publication_date">
+                    </div>
+                    <div>
+                        <label>Date of Grant:</label>
+                        <input type="date" name="grant_date">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Patent Office:*</label>
+                        <input type="text" name="patent_office" required placeholder="e.g., Indian Patent Office, USPTO">
+                    </div>
+                    <div>
+                        <label>Status:*</label>
+                        <select name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Filed">Filed</option>
+                            <option value="Published">Published</option>
+                            <option value="Granted">Granted</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Patent Type:*</label>
+                        <select name="patent_type" required>
+                            <option value="">Select Type</option>
+                            <option value="National">National</option>
+                            <option value="International">International</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Patent Link/Reference:</label>
+                        <input type="url" name="patent_link" placeholder="https://">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label>Patent Certificate Drive Link:</label>
+                    <input type="url" name="certificate_link" placeholder="https://drive.google.com/..." style="width: 100%;">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn" style="background: #27ae60;">Add Patent</button>
+                    <button type="button" class="btn" style="background: #95a5a6;" onclick="hideAddForm('patent')">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Patents List -->
+        {% if patents %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Patent Title</th>
+                        <th>Application Number</th>
+                        <th>Patent Office</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patent in patents %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ patent.patent_title[:100] }}{% if patent.patent_title|length > 100 %}...{% endif %}</strong>
+                        </td>
+                        <td>{{ patent.patent_application_number }}</td>
+                        <td>{{ patent.patent_office }}</td>
+                        <td>
+                            <span class="badge" style="background: 
+                                {% if patent.status == 'Granted' %}#27ae60
+                                {% elif patent.status == 'Published' %}#f39c12
+                                {% else %}#3498db{% endif %}">
+                                {{ patent.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge" style="background: 
+                                {% if patent.patent_type == 'International' %}#e74c3c
+                                {% else %}#9b59b6{% endif %}">
+                                {{ patent.patent_type }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-small view-btn" onclick="viewPatent({{ patent.id }})">View</button>
+                                {% if can_edit %}
+                                <button class="btn-small edit-btn" onclick="editPatent({{ patent.id }})">Edit</button>
+                                <a href="/delete_patent/{{ patent.id }}" class="btn-small delete-btn" onclick="return confirm('Delete this patent?')">Delete</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 10px;">
+            <h4 style="color: #7f8c8d;">No Patents Added Yet</h4>
+            <p style="color: #95a5a6;">Start by adding your first patent.</p>
+        </div>
+        {% endif %}
+    </div>
+
+<style>
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #ecf0f1;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #7f8c8d;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab-button:hover {
+    color: #3498db;
+    background: #f8f9fa;
+}
+
+.tab-button.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.add-form {
+    background: white;
+    border: 2px dashed #3498db;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.data-table tr:hover {
+    background: #f8f9fa;
+}
+
+.badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    margin: 1px;
+    display: inline-block;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.view-btn { background: #3498db; color: white; }
+.edit-btn { background: #f39c12; color: white; }
+.delete-btn { background: #e74c3c; color: white; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+</style>
+
+<script>
+function openTab(tabName) {
+    // Hide all tab contents
+    var tabContents = document.getElementsByClassName('tab-content');
+    for (var i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+    }
+
+    // Remove active class from all buttons
+    var tabButtons = document.getElementsByClassName('tab-button');
+    for (var i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+    }
+
+    // Show the specific tab content and activate button
+    document.getElementById(tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+function showAddForm(type) {
+    document.getElementById(type + '-form').style.display = 'block';
+}
+
+function hideAddForm(type) {
+    document.getElementById(type + '-form').style.display = 'none';
+}
+
+// View functions - Show detailed view in modal
+function viewJournal(id) {
+    // Redirect to a detailed view page or show modal
+    window.location.href = '/view_journal/' + id;
+}
+
+function editJournal(id) {
+    // Redirect to edit page
+    window.location.href = '/edit_journal/' + id;
+}
+
+function viewConference(id) {
+    window.location.href = '/view_conference/' + id;
+}
+
+function editConference(id) {
+    window.location.href = '/edit_conference/' + id;
+}
+
+function viewBookChapter(id) {
+    window.location.href = '/view_book_chapter/' + id;
+}
+
+function editBookChapter(id) {
+    window.location.href = '/edit_book_chapter/' + id;
+}
+
+function viewPatent(id) {
+    window.location.href = '/view_patent/' + id;
+}
+
+function editPatent(id) {
+    window.location.href = '/edit_patent/' + id;
+}
+
+// Alternative: Show details in modal (if you prefer modals instead of new pages)
+function showDetailsModal(type, id, data) {
+    // This would require additional HTML modal structure
+    alert('Detailed ' + type + ' view for ID: ' + id + '\n\nImplement modal or redirect to detailed page');
+}
+</script>
+{% endblock %}

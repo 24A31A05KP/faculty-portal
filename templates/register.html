@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Faculty Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 450px;
+        }
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .register-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .btn-register {
+            width: 100%;
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-register:hover {
+            background: #219a52;
+        }
+        
+        /* Flash Message Styles */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-message {
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            border-left: 5px solid;
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        .flash-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left-color: #17a2b8;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .demo-credentials {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        /* Error state for form fields */
+        .error-field {
+            border-color: #dc3545 !important;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>📝 Register</h1>
+            <p>Create a new account</p>
+        </div>
+
+        <!-- Flash Messages Section -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}" id="flash-{{ loop.index }}">
+                            {% if category == 'success' %}✅ 
+                            {% elif category == 'error' %}❌ 
+                            {% elif category == 'info' %}ℹ️ 
+                            {% else %}📢{% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Enter your username"
+                       value="{{ form_data.username if form_data else '' }}"
+                       class="{% if error and 'username' in error %}error-field{% endif %}">
+                {% if error and 'username' in error %}
+                    <div class="error-message">{{ error.username }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required
+                       placeholder="Enter your email address"
+                       value="{{ form_data.email if form_data else '' }}"
+                       class="{% if error and 'email' in error %}error-field{% endif %}">
+                {% if error and 'email' in error %}
+                    <div class="error-message">{{ error.email }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required
+                       placeholder="Enter your password"
+                       class="{% if error and 'password' in error %}error-field{% endif %}">
+                {% if error and 'password' in error %}
+                    <div class="error-message">{{ error.password }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="role">Role:</label>
+                <select id="role" name="role">
+                    <option value="Faculty" {% if form_data and form_data.role == 'Faculty' %}selected{% endif %}>Faculty</option>
+                    <option value="Office" {% if form_data and form_data.role == 'Office' %}selected{% endif %}>Office</option>
+                    <option value="IQAC" {% if form_data and form_data.role == 'IQAC' %}selected{% endif %}>IQAC</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-register">Register</button>
+        </form>
+        <div class="login-link">
+            <p>Already have an account? <a href="/login">Login here</a></p>
+        </div>
+    </div>
+
+    <!-- Auto-hide flash messages after 8 seconds -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            
+            flashMessages.forEach(message => {
+                // Auto-hide after 8 seconds
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        if (message.parentElement) {
+                            message.parentElement.removeChild(message);
+                        }
+                    }, 500);
+                }, 8000);
+                
+                // Also allow manual close by clicking
+                message.addEventListener('click', function() {
+                    this.style.opacity = '0';
+                    setTimeout(() => {
+                        if (this.parentElement) {
+                            this.parentElement.removeChild(this);
+                        }
+                    }, 500);
+                });
+            });
+
+            // Clear form fields if there was a successful registration
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'success' %}
+                    // Clear form on success
+                    document.querySelector('form').reset();
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

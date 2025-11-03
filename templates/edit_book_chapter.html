@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>✏️ Edit Book Chapter</h2>
+        <a href="/faculty/{{ chapter.faculty_id }}/publications" class="btn" style="background: #3498db;">← Back to R&D</a>
+    </div>
+
+    <form method="POST" style="background: #f8f9fa; padding: 25px; border-radius: 10px;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Department:*</label>
+                <select name="department" required>
+                    <option value="">Select Department</option>
+                    <option value="CIVIL" {% if chapter.department == 'CIVIL' %}selected{% endif %}>CIVIL</option>
+                    <option value="EEE" {% if chapter.department == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if chapter.department == 'MECH' %}selected{% endif %}>MECH</option>
+                    <option value="ECE" {% if chapter.department == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="CSE" {% if chapter.department == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="CSE-AI" {% if chapter.department == 'CSE-AI' %}selected{% endif %}>CSE-AI</option>
+                    <option value="CSE-DS" {% if chapter.department == 'CSE-DS' %}selected{% endif %}>CSE-DS</option>
+                    <option value="CSE-AI&ML" {% if chapter.department == 'CSE-AI&ML' %}selected{% endif %}>CSE-AI&ML</option>
+                    <option value="CSE-CS" {% if chapter.department == 'CSE-CS' %}selected{% endif %}>CSE-CS</option>
+                    <option value="IT" {% if chapter.department == 'IT' %}selected{% endif %}>IT</option>
+                </select>
+            </div>
+            <div>
+                <label>Chapter Title:*</label>
+                <input type="text" name="chapter_title" value="{{ chapter.chapter_title }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Book Title:*</label>
+                <input type="text" name="book_title" value="{{ chapter.book_title }}" required>
+            </div>
+            <div>
+                <label>Authors:*</label>
+                <textarea name="authors" required placeholder="Enter all authors separated by commas">{{ chapter.authors }}</textarea>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Faculty Author Position:*</label>
+                <select name="faculty_author_position" required>
+                    <option value="">Select Position</option>
+                    <option value="First Author" {% if chapter.faculty_author_position == 'First Author' %}selected{% endif %}>First Author</option>
+                    <option value="Second Author" {% if chapter.faculty_author_position == 'Second Author' %}selected{% endif %}>Second Author</option>
+                    <option value="Corresponding Author" {% if chapter.faculty_author_position == 'Corresponding Author' %}selected{% endif %}>Corresponding Author</option>
+                    <option value="Co-author" {% if chapter.faculty_author_position == 'Co-author' %}selected{% endif %}>Co-author</option>
+                </select>
+            </div>
+            <div>
+                <label>Corresponding Author:*</label>
+                <input type="text" name="corresponding_author" value="{{ chapter.corresponding_author }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Publisher:*</label>
+                <input type="text" name="publisher" value="{{ chapter.publisher }}" required>
+            </div>
+            <div>
+                <label>ISBN Number:</label>
+                <input type="text" name="isbn_number" value="{{ chapter.isbn_number or '' }}">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Chapter DOI:</label>
+                <input type="text" name="chapter_doi" value="{{ chapter.chapter_doi or '' }}">
+            </div>
+            <div>
+                <label>Year of Publication:*</label>
+                <input type="number" name="year_of_publication" value="{{ chapter.year_of_publication }}" min="1900" max="2030" required>
+            </div>
+            <div>
+                <label>Indexing:</label>
+                <select name="indexing">
+                    <option value="">Select Indexing</option>
+                    <option value="Scopus" {% if chapter.indexing == 'Scopus' %}selected{% endif %}>Scopus</option>
+                    <option value="SCI" {% if chapter.indexing == 'SCI' %}selected{% endif %}>SCI</option>
+                    <option value="WoS" {% if chapter.indexing == 'WoS' %}selected{% endif %}>Web of Science</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Quartile:</label>
+                <select name="quartile">
+                    <option value="">Select Quartile</option>
+                    <option value="Q1" {% if chapter.quartile == 'Q1' %}selected{% endif %}>Q1</option>
+                    <option value="Q2" {% if chapter.quartile == 'Q2' %}selected{% endif %}>Q2</option>
+                    <option value="Q3" {% if chapter.quartile == 'Q3' %}selected{% endif %}>Q3</option>
+                    <option value="Q4" {% if chapter.quartile == 'Q4' %}selected{% endif %}>Q4</option>
+                </select>
+            </div>
+            <div>
+                <label>Impact Factor:</label>
+                <input type="number" name="impact_factor" value="{{ chapter.impact_factor or 0 }}" step="0.001" placeholder="0.000">
+            </div>
+            <div>
+                <label>Chapter Link:</label>
+                <input type="url" name="chapter_link" value="{{ chapter.chapter_link or '' }}" placeholder="https://">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn" style="background: #27ae60;">Update Book Chapter</button>
+            <a href="/faculty/{{ chapter.faculty_id }}/publications" class="btn" style="background: #95a5a6;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+</style>
+{% endblock %}

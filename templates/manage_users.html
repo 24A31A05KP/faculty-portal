@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>👥 User Management</h2>
+        <div style="display: flex; gap: 10px;">
+            <a href="/approve_users" class="btn" style="background: #f39c12;">📋 Approve Users</a>
+            <a href="/register" class="btn" style="background: #27ae60;">➕ Add New User</a>
+        </div>
+    </div>
+
+    {% if users %}
+    <table class="faculty-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <span style="background: 
+                        {% if user.role == 'IQAC' %}#e74c3c
+                        {% elif user.role == 'Office' %}#f39c12
+                        {% else %}#3498db{% endif %}; 
+                        color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                        {{ user.role|title }}
+                    </span>
+                </td>
+                <td>
+                    <span style="background: {% if user.approved %}#27ae60{% else %}#e74c3c{% endif %}; 
+                        color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                        {% if user.approved %}✅ Approved{% else %}⏳ Pending{% endif %}
+                    </span>
+                </td>
+                <td>
+                    {% if user.last_login %}
+                        {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
+                    {% else %}
+                        Never
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        {% if user.username != session.username %}
+                        <a href="/delete_user/{{ user.id }}" style="background: #e74c3c; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;" onclick="return confirm('Delete this user?')">Delete</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #7f8c8d;">No Users Found</h3>
+        <p style="color: #95a5a6;">Start by adding the first user.</p>
+        <a href="/register" class="btn" style="background: #3498db; margin-top: 20px;">Add First User</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Add New Faculty Member</h2>
+    
+    <form method="POST" enctype="multipart/form-data" style="max-width: 800px;">
+        <h3>Personal Information</h3>
+        
+        <!-- Name Change & Documents -->
+        <h3>Name Change & Documents</h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
+                    <input type="checkbox" name="name_change" value="1">
+                    Is there any name change w.r.t SSC?
+                </label>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Marital Status:</label>
+                <select name="marital_status" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Status</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold;">Proof Document for Name Change:</label>
+            <div style="border: 2px dashed #ddd; padding: 20px; border-radius: 10px; background: #fafafa;">
+                <input type="file" name="name_change_proof" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="margin: 0 auto 10px; display: block;">
+                <small style="color: #7f8c8d;">
+                    Supported formats: PDF, DOC, DOCX, JPG, PNG (Max: 5MB)
+                </small>
+            </div>
+        </div>
+
+        <!-- Profile Photo -->
+        <div style="margin-bottom: 20px; text-align: center;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold;">Profile Photo:</label>
+            <div style="border: 2px dashed #ddd; padding: 20px; border-radius: 10px; background: #fafafa;">
+                <input type="file" name="photo" accept="image/*" style="margin: 0 auto 10px; display: block;">
+                <small style="color: #7f8c8d;">Supported formats: JPG, PNG, JPEG (Max: 2MB)</small>
+            </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Employee ID:*</label>
+                <input type="text" name="employee_id" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name:*</label>
+                <input type="text" name="name_ssc" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Date of Birth & Gender -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Birth:*</label>
+                <input type="date" name="dob" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Gender:*</label>
+                <select name="gender" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Gender</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Blood Group & Marital Status -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Blood Group:</label>
+                <select name="blood_group" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+            <div>
+                <!-- Empty for alignment -->
+            </div>
+        </div>
+
+        <!-- Caste Category -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Caste Category:*</label>
+                <select name="caste" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Caste</option>
+                    <option value="General (Open Category)">General (Open Category)</option>
+                    <option value="OBC (Other Backward Classes)">OBC (Other Backward Classes)</option>
+                    <option value="SC (Scheduled Castes)">SC (Scheduled Castes)</option>
+                    <option value="ST (Scheduled Tribes)">ST (Scheduled Tribes)</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Subcaste:</label>
+                <input type="text" name="subcaste" placeholder="Enter subcaste (if applicable)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Father's Name -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Father's Name:*</label>
+            <input type="text" name="father_name" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <h3>Contact Information</h3>
+        
+        <!-- Email & Mobile -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email:*</label>
+                <input type="email" name="email" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mobile Number:*</label>
+                <input type="text" name="mobile_no" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Alternate Mobile -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Alternate Mobile:</label>
+                <input type="text" name="alternative_mobile" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty for alignment -->
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Present Address:*</label>
+            <textarea name="present_address" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 80px;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Permanent Address:*</label>
+            <textarea name="permanent_address" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 80px;"></textarea>
+        </div>
+
+        <h3>Professional Information</h3>
+        
+        <!-- Department & Designation -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Department:*</label>
+                <select name="department" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Department</option>
+                    <option value="CIVIL">CIVIL</option>
+                    <option value="EEE">EEE</option>
+                    <option value="MECH">MECH</option>
+                    <option value="ECE">ECE</option>
+                    <option value="CSE">CSE</option>
+                    <option value="CSE-AI">CSE-AI</option>
+                    <option value="CSE-DS">CSE-DS</option>
+                    <option value="CSE-AI&ML">CSE-AI&ML</option>
+                    <option value="CSE-CS">CSE-CS</option>
+                    <option value="IT">IT</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Designation:*</label>
+                <select name="designation" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Designation</option>
+                    <option value="Professor">Professor</option>
+                    <option value="Associate Professor">Associate Professor</option>
+                    <option value="Assistant Professor">Assistant Professor</option>
+                </select>
+            </div>
+        </div>
+            <!-- Date of Joining & Appointment Type -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Joining:*</label>
+                <input type="date" name="date_of_joining" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Appointment Type:*</label>
+                <select name="appointment_type" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Type</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Visiting">Visiting</option>
+                    <option value="Adhoc">Adhoc</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+        </div>    
+        <!-- Experience Details -->
+        <h3>Experience Details</h3>
+        
+        <!-- Teaching Experience -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teaching Experience at Pragati (Years):*</label>
+                <input type="number" name="teaching_exp_pragati" min="0" max="50" step="0.1" required value="0"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teaching Experience at Other Institutions (Years):*</label>
+                <input type="number" name="teaching_exp_other" min="0" max="50" step="0.1" required value="0"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Industrial Experience -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Industrial Experience (Years):*</label>
+                <input type="number" name="industrial_exp" min="0" max="50" step="0.1" required value="0"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Overall Experience (Years):*</label>
+                <input type="number" name="overall_exp" min="0" max="50" step="0.1" required value="0"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" readonly>
+            </div>
+        </div>
+
+        <!-- Auto-calculated Experience Category -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Experience Category:</label>
+                <div id="experienceCategoryDisplay" style="background: #e74c3c; color: white; padding: 8px 12px; border-radius: 4px; font-weight: bold; text-align: center;">
+                    0-5 Years
+                </div>
+                <input type="hidden" name="experience_category" id="experienceCategoryInput" value="0-5">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Ratification Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ratified:</label>
+                <select name="ratified" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ratified Designation:</label>
+                <input type="text" name="ratified_designation" placeholder="Enter ratified designation" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Ratification:</label>
+                <input type="date" name="ratification_date" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Previous Employment -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Last Working Date (Previous Employment):</label>
+                <input type="date" name="previous_employment_date" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Resignation Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Resignation (Pragati Engineering College):</label>
+                <input type="date" name="resignation_date" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <h3>Document Details</h3>
+        
+        <!-- Aadhaar & PAN -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Aadhaar Number:</label>
+                <input type="text" name="aadhaar_number" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">PAN Number:</label>
+                <input type="text" name="pan_number" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <h3>Bank Details</h3>
+        
+        <!-- Bank Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Bank Name:*</label>
+                <input type="text" name="bank_name" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Bank Account No:*</label>
+                <input type="text" name="bank_account_no" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">IFSC Code:*</label>
+                <input type="text" name="ifsc_code" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space for alignment -->
+            </div>
+        </div>
+
+        <button type="submit" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Add Faculty Member</button>
+        <a href="/faculty" style="margin-left: 10px; color: #3498db;">Cancel</a>
+    </form>
+</div>
+
+<!-- Auto-calculate overall experience and category with INTEGER calculation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    // Get experience field elements
+    const dateOfJoiningInput = document.querySelector('input[name="date_of_joining"]');
+    const pragatiInput = document.querySelector('input[name="teaching_exp_pragati"]');
+    const otherInput = document.querySelector('input[name="teaching_exp_other"]');
+    const industrialInput = document.querySelector('input[name="industrial_exp"]');
+    const overallInput = document.querySelector('input[name="overall_exp"]');
+    const categoryDisplay = document.getElementById('experienceCategoryDisplay');
+    const categoryInput = document.getElementById('experienceCategoryInput');
+
+    // Function to calculate Pragati experience from joining date
+    function calculatePragatiExperience() {
+        if (!dateOfJoiningInput.value) return 0;
+        
+        const joinDate = new Date(dateOfJoiningInput.value);
+        const currentDate = new Date();
+        
+        // Calculate difference in years with decimal precision
+        const diffTime = currentDate - joinDate;
+        const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25);
+        
+        // Return 0 if future date, otherwise return calculated years
+        return diffYears > 0 ? Math.round(diffYears * 10) / 10 : 0;
+    }
+    
+    // Function to calculate overall experience and update category
+    function calculateOverallAndCategory() {
+        // Auto-calculate Pragati experience
+        const pragatiExp = calculatePragatiExperience();
+        pragatiInput.value = pragatiExp.toFixed(1);
+        
+        const other = parseFloat(otherInput.value) || 0;
+        const industrial = parseFloat(industrialInput.value) || 0;
+        
+        const overall = pragatiExp + other + industrial;
+        overallInput.value = overall.toFixed(1);
+        
+        // Auto-determine experience category using INTEGER values (5.9 = 5 years)
+        const overallInteger = Math.floor(overall); // Convert to integer (5.9 becomes 5)
+        let category, bgColor, text;
+        
+        if (overall <= 5.9) {
+        category = '0-5';
+        bgColor = '#e74c3c'; // Red
+        text = '0-5 Years (up to 5.9)';
+    } else if (overall <= 10.9) {
+        category = '6-10';
+        bgColor = '#f39c12'; // Orange
+        text = '6-10 Years (up to 10.9)';
+    } else {
+        category = '10+';
+        bgColor = '#27ae60'; // Green
+        text = '10+ Years (above 10)';
+    }
+        
+        // Update display
+        categoryDisplay.textContent = text;
+        categoryDisplay.style.backgroundColor = bgColor;
+        categoryInput.value = category;
+    }
+    
+    // Event listeners for automatic calculations
+    dateOfJoiningInput.addEventListener('change', calculateOverallAndCategory);
+    dateOfJoiningInput.addEventListener('input', calculateOverallAndCategory);
+    
+    otherInput.addEventListener('input', calculateOverallAndCategory);
+    industrialInput.addEventListener('input', calculateOverallAndCategory);
+    
+    // Calculate on page load
+    calculateOverallAndCategory();
+    
+    // Add info tooltip for Pragati experience
+    const pragatiContainer = pragatiInput.parentElement;
+    const infoText = document.createElement('small');
+    infoText.style.color = '#7f8c8d';
+    infoText.style.display = 'block';
+    infoText.style.marginTop = '5px';
+    infoText.innerHTML = '🔄 Auto-calculated from Date of Joining';
+    pragatiContainer.appendChild(infoText);
+
+    // Add info tooltip for overall experience
+    const overallContainer = overallInput.parentElement;
+    const overallInfoText = document.createElement('small');
+    overallInfoText.style.color = '#7f8c8d';
+    overallInfoText.style.display = 'block';
+    overallInfoText.style.marginTop = '5px';
+    overallInfoText.innerHTML = '🔄 Auto-calculated (Pragati + Other + Industrial)';
+    overallContainer.appendChild(overallInfoText);
+
+    // Add info tooltip for experience category
+    const categoryContainer = categoryDisplay.parentElement;
+    const categoryInfoText = document.createElement('small');
+    categoryInfoText.style.color = '#7f8c8d';
+    categoryInfoText.style.display = 'block';
+    categoryInfoText.style.marginTop = '5px';
+    categoryInfoText.innerHTML = '📊 Based on integer years (5.9 = 5 years)';
+    categoryContainer.appendChild(categoryInfoText);
+
+    // ========== YOUR EXISTING VALIDATION CODE ==========
+    
+    // Text validation function
+    function validateText(input) {
+        const value = input.value.trim();
+        const fieldName = input.getAttribute('name');
+        
+        // Skip email fields
+        if (fieldName === 'email') return true;
+        
+        // Validation rules
+        if (value === '') {
+            if (input.required) {
+                showError(input, 'This field is required');
+                return false;
+            }
+            return true;
+        }
+        
+        // Name validation (letters, spaces, hyphens, apostrophes)
+        if (fieldName === 'name_ssc' || fieldName === 'father_name') {
+            const nameRegex = /^[a-zA-Z\s\.\-']+$/;
+            if (!nameRegex.test(value)) {
+                showError(input, 'Only letters, spaces, hyphens, and apostrophes are allowed');
+                return false;
+            }
+            if (value.length < 2) {
+                showError(input, 'Name must be at least 2 characters long');
+                return false;
+            }
+        }
+        
+        // Employee ID validation (alphanumeric, hyphens, underscores)
+        if (fieldName === 'employee_id') {
+            const idRegex = /^[a-zA-Z0-9\-_]+$/;
+            if (!idRegex.test(value)) {
+                showError(input, 'Only letters, numbers, hyphens, and underscores are allowed');
+                return false;
+            }
+        }
+        
+        // Mobile number validation (Indian format)
+        if (fieldName === 'mobile_no' || fieldName === 'alternative_mobile') {
+            const mobileRegex = /^[6-9]\d{9}$/;
+            if (value && !mobileRegex.test(value)) {
+                showError(input, 'Please enter a valid 10-digit mobile number');
+                return false;
+            }
+        }
+        
+        // Aadhaar validation (12 digits)
+        if (fieldName === 'aadhaar_number' && value) {
+            const aadhaarRegex = /^\d{12}$/;
+            if (!aadhaarRegex.test(value)) {
+                showError(input, 'Aadhaar number must be 12 digits');
+                return false;
+            }
+        }
+        
+        // PAN validation
+        if (fieldName === 'pan_number' && value) {
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            if (!panRegex.test(value)) {
+                showError(input, 'Please enter a valid PAN number (e.g., ABCDE1234F)');
+                return false;
+            }
+        }
+        
+        // Bank account validation (numbers only)
+        if (fieldName === 'bank_account_no') {
+            const accountRegex = /^\d+$/;
+            if (!accountRegex.test(value)) {
+                showError(input, 'Bank account number should contain only numbers');
+                return false;
+            }
+            if (value.length < 9 || value.length > 18) {
+                showError(input, 'Bank account number should be between 9-18 digits');
+                return false;
+            }
+        }
+        
+        // IFSC code validation
+        if (fieldName === 'ifsc_code') {
+            const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+            if (!ifscRegex.test(value)) {
+                showError(input, 'Please enter a valid IFSC code (e.g., SBIN0000123)');
+                return false;
+            }
+        }
+        
+        // Address validation (basic length check)
+        if ((fieldName === 'present_address' || fieldName === 'permanent_address') && value.length < 10) {
+            showError(input, 'Address should be at least 10 characters long');
+            return false;
+        }
+        
+        // General text validation for other fields
+        const generalTextFields = ['bank_name', 'domain_specialization', 'institution_name', 'ratified_designation', 'subcaste'];
+        if (generalTextFields.includes(fieldName)) {
+            const textRegex = /^[a-zA-Z0-9\s\.,\-_&()]+$/;
+            if (value && !textRegex.test(value)) {
+                showError(input, 'Only letters, numbers, spaces, and basic punctuation are allowed');
+                return false;
+            }
+        }
+        
+        // Clear any previous error
+        clearError(input);
+        return true;
+    }
+    
+    // Show error message
+    function showError(input, message) {
+        clearError(input);
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error';
+        errorDiv.style.color = '#e74c3c';
+        errorDiv.style.fontSize = '12px';
+        errorDiv.style.marginTop = '5px';
+        errorDiv.textContent = message;
+        
+        input.style.borderColor = '#e74c3c';
+        input.parentNode.appendChild(errorDiv);
+    }
+    
+    // Clear error message
+    function clearError(input) {
+        input.style.borderColor = '#ddd';
+        const existingError = input.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+    
+    // Real-time validation on input
+    const textInputs = form.querySelectorAll('input[type="text"], input[type="number"], textarea, select');
+    textInputs.forEach(input => {
+        // Skip email fields
+        if (input.getAttribute('name') === 'email') return;
+        
+        input.addEventListener('blur', function() {
+            validateText(this);
+        });
+        
+        input.addEventListener('input', function() {
+            clearError(this);
+        });
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        textInputs.forEach(input => {
+            // Skip email fields
+            if (input.getAttribute('name') === 'email') return;
+            
+            if (!validateText(input)) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the validation errors before submitting.');
+        }
+    });
+    
+    // Additional validation for experience fields
+    const experienceFields = ['teaching_exp_pragati', 'teaching_exp_other', 'industrial_exp', 'overall_exp'];
+    experienceFields.forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+            field.addEventListener('blur', function() {
+                const value = parseFloat(this.value) || 0;
+                if (value < 0) {
+                    showError(this, 'Experience cannot be negative');
+                } else if (value > 50) {
+                    showError(this, 'Experience seems too high. Please verify.');
+                } else {
+                    clearError(this);
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

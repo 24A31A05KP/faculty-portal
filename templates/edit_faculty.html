@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Edit Faculty Member</h2>
+    
+    <form method="POST" enctype="multipart/form-data" style="max-width: 800px;">
+        <h3>Personal Information</h3>
+        
+        <!-- Name Change & Documents -->
+        <h3>Name Change & Documents</h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
+                    <input type="checkbox" name="name_change" value="1" 
+                           {% if faculty.name_change %}checked{% endif %}>
+                    Is there any name change w.r.t SSC?
+                </label>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Marital Status:</label>
+                <select name="marital_status" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Status</option>
+                    <option value="Single" {% if faculty.marital_status == 'Single' %}selected{% endif %}>Single</option>
+                    <option value="Married" {% if faculty.marital_status == 'Married' %}selected{% endif %}>Married</option>
+                    <option value="Divorced" {% if faculty.marital_status == 'Divorced' %}selected{% endif %}>Divorced</option>
+                    <option value="Widowed" {% if faculty.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold;">Proof Document for Name Change:</label>
+            
+            <!-- Show current document if exists -->
+            {% if faculty.name_change_proof %}
+            <div style="background: #e8f4fd; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                <strong>Current Document:</strong> 
+                <a href="/static/{{ faculty.name_change_proof }}" target="_blank" style="color: #3498db; margin-left: 10px;">
+                    📄 View Document
+                </a>
+                <label style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
+                    <input type="checkbox" name="remove_name_change_proof">
+                    Remove current document
+                </label>
+            </div>
+            {% endif %}
+            
+            <div style="border: 2px dashed #ddd; padding: 20px; border-radius: 10px; background: #fafafa;">
+                <input type="file" name="name_change_proof" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="margin: 0 auto 10px; display: block;">
+                <small style="color: #7f8c8d;">
+                    Supported formats: PDF, DOC, DOCX, JPG, PNG (Max: 5MB)
+                </small>
+            </div>
+        </div>
+
+        <!-- Profile Photo -->
+        <div style="margin-bottom: 20px; text-align: center;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold;">Profile Photo:</label>
+            <div style="border: 2px dashed #ddd; padding: 20px; border-radius: 10px; background: #fafafa;">
+                <!-- Current Photo -->
+                {% if faculty.photo_path %}
+                <div style="margin-bottom: 15px;">
+                    <p style="margin-bottom: 10px; font-weight: bold;">Current Photo:</p>
+                    <img src="/static/{{ faculty.photo_path }}" alt="Current Photo" style="width: 100px; height: 100px; border-radius: 8px; object-fit: cover; border: 2px solid #3498db;">
+                </div>
+                {% endif %}
+                
+                <!-- Upload New Photo -->
+                <input type="file" name="photo" accept="image/*" style="margin: 0 auto 10px; display: block;">
+                <small style="color: #7f8c8d;">Supported formats: JPG, PNG, JPEG (Max: 2MB)</small>
+                {% if faculty.photo_path %}
+                <div style="margin-top: 10px;">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" name="remove_photo">
+                        Remove current photo
+                    </label>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Employee ID:*</label>
+                <input type="text" name="employee_id" value="{{ faculty.employee_id }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name:*</label>
+                <input type="text" name="name_ssc" value="{{ faculty.name_ssc }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Date of Birth & Gender -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Birth:*</label>
+                <input type="date" name="dob" value="{{ faculty.dob }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Gender:*</label>
+                <select name="gender" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="M" {% if faculty.gender == 'M' %}selected{% endif %}>Male</option>
+                    <option value="F" {% if faculty.gender == 'F' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if faculty.gender == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Blood Group -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Blood Group:</label>
+                <select name="blood_group" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+" {% if faculty.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                    <option value="A-" {% if faculty.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                    <option value="B+" {% if faculty.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                    <option value="B-" {% if faculty.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                    <option value="AB+" {% if faculty.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                    <option value="AB-" {% if faculty.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                    <option value="O+" {% if faculty.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                    <option value="O-" {% if faculty.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                </select>
+            </div>
+            <div>
+                <!-- Empty for alignment -->
+            </div>
+        </div>
+
+        <!-- Caste Category -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Caste Category:*</label>
+                <select name="caste" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="General (Open Category)" {% if faculty.caste == 'General (Open Category)' %}selected{% endif %}>General (Open Category)</option>
+                    <option value="OBC (Other Backward Classes)" {% if faculty.caste == 'OBC (Other Backward Classes)' %}selected{% endif %}>OBC (Other Backward Classes)</option>
+                    <option value="SC (Scheduled Castes)" {% if faculty.caste == 'SC (Scheduled Castes)' %}selected{% endif %}>SC (Scheduled Castes)</option>
+                    <option value="ST (Scheduled Tribes)" {% if faculty.caste == 'ST (Scheduled Tribes)' %}selected{% endif %}>ST (Scheduled Tribes)</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Subcaste:</label>
+                <input type="text" name="subcaste" value="{{ faculty.subcaste or '' }}" placeholder="Enter subcaste (if applicable)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Father's Name -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Father's Name:*</label>
+            <input type="text" name="father_name" value="{{ faculty.father_name }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <h3>Contact Information</h3>
+        
+        <!-- Email & Mobile -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email:*</label>
+                <input type="email" name="email" value="{{ faculty.email }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mobile Number:*</label>
+                <input type="text" name="mobile_no" value="{{ faculty.mobile_no }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Alternate Mobile -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Alternate Mobile:</label>
+                <input type="text" name="alternative_mobile" value="{{ faculty.alternative_mobile or '' }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty for alignment -->
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Present Address:*</label>
+            <textarea name="present_address" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 80px;">{{ faculty.present_address }}</textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Permanent Address:*</label>
+            <textarea name="permanent_address" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 80px;">{{ faculty.permanent_address }}</textarea>
+        </div>
+
+        <h3>Professional Information</h3>
+        
+        <!-- Department & Designation -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Department:*</label>
+                <select name="department" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="CIVIL" {% if faculty.department == 'CIVIL' %}selected{% endif %}>CIVIL</option>
+                    <option value="EEE" {% if faculty.department == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if faculty.department == 'MECH' %}selected{% endif %}>MECH</option>
+                    <option value="ECE" {% if faculty.department == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="CSE" {% if faculty.department == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="CSE-AI" {% if faculty.department == 'CSE-AI' %}selected{% endif %}>CSE-AI</option>
+                    <option value="CSE-DS" {% if faculty.department == 'CSE-DS' %}selected{% endif %}>CSE-DS</option>
+                    <option value="CSE-AI&ML" {% if faculty.department == 'CSE-AI&ML' %}selected{% endif %}>CSE-AI&ML</option>
+                    <option value="CSE-CS" {% if faculty.department == 'CSE-CS' %}selected{% endif %}>CSE-CS</option>
+                    <option value="IT" {% if faculty.department == 'IT' %}selected{% endif %}>IT</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Designation:*</label>
+                <select name="designation" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="Professor" {% if faculty.designation == 'Professor' %}selected{% endif %}>Professor</option>
+                    <option value="Associate Professor" {% if faculty.designation == 'Associate Professor' %}selected{% endif %}>Associate Professor</option>
+                    <option value="Assistant Professor" {% if faculty.designation == 'Assistant Professor' %}selected{% endif %}>Assistant Professor</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Experience Details -->
+        <h3>Experience Details</h3>
+        
+        <!-- Teaching Experience -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teaching Experience at Pragati (Years):*</label>
+                <input type="number" name="teaching_exp_pragati" value="{{ faculty.teaching_exp_pragati or 0 }}" min="0" max="50" step="0.1" required 
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teaching Experience at Other Institutions (Years):*</label>
+                <input type="number" name="teaching_exp_other" value="{{ faculty.teaching_exp_other or 0 }}" min="0" max="50" step="0.1" required 
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <!-- Industrial Experience -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Industrial Experience (Years):*</label>
+                <input type="number" name="industrial_exp" value="{{ faculty.industrial_exp or 0 }}" min="0" max="50" step="0.1" required 
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Overall Experience (Years):*</label>
+                <input type="number" name="overall_exp" value="{{ faculty.overall_exp or 0 }}" min="0" max="50" step="0.1" required 
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" readonly>
+            </div>
+        </div>
+
+        <!-- Auto-calculated Experience Category -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Experience Category:</label>
+                <div id="experienceCategoryDisplay" style="background: #e74c3c; color: white; padding: 8px 12px; border-radius: 4px; font-weight: bold; text-align: center;">
+                    0-5 Years
+                </div>
+                <input type="hidden" name="experience_category" id="experienceCategoryInput" value="0-5">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Ratification Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ratified:</label>
+                <select name="ratified" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="No" {% if faculty.ratified == 'No' %}selected{% endif %}>No</option>
+                    <option value="Yes" {% if faculty.ratified == 'Yes' %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ratified Designation:</label>
+                <input type="text" name="ratified_designation" value="{{ faculty.ratified_designation or '' }}" placeholder="Enter ratified designation" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Ratification:</label>
+                <input type="date" name="ratification_date" value="{{ faculty.ratification_date or '' }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Previous Employment -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Last Working Date (Previous Employment):</label>
+                <input type="date" name="previous_employment_date" value="{{ faculty.previous_employment_date or '' }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Resignation Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Resignation (Pragati Engineering College):</label>
+                <input type="date" name="resignation_date" value="{{ faculty.resignation_date or '' }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space -->
+            </div>
+        </div>
+
+        <!-- Date of Joining & Appointment Type -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Date of Joining:*</label>
+                <input type="date" name="date_of_joining" value="{{ faculty.date_of_joining }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Appointment Type:*</label>
+                <select name="appointment_type" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="Regular" {% if faculty.appointment_type == 'Regular' %}selected{% endif %}>Regular</option>
+                    <option value="Visiting" {% if faculty.appointment_type == 'Visiting' %}selected{% endif %}>Visiting</option>
+                    <option value="Adhoc" {% if faculty.appointment_type == 'Adhoc' %}selected{% endif %}>Adhoc</option>
+                    <option value="Others" {% if faculty.appointment_type == 'Others' %}selected{% endif %}>Others</option>
+                </select>
+            </div>
+        </div>
+
+        <h3>Document Details</h3>
+        
+        <!-- Aadhaar & PAN -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Aadhaar Number:</label>
+                <input type="text" name="aadhaar_number" value="{{ faculty.aadhaar_number or '' }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">PAN Number:</label>
+                <input type="text" name="pan_number" value="{{ faculty.pan_number or '' }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <h3>Bank Details</h3>
+        
+        <!-- Bank Details -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Bank Name:*</label>
+                <input type="text" name="bank_name" value="{{ faculty.bank_name or '' }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Bank Account No:*</label>
+                <input type="text" name="bank_account_no" value="{{ faculty.bank_account_no }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">IFSC Code:*</label>
+                <input type="text" name="ifsc_code" value="{{ faculty.ifsc_code }}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <!-- Empty space for alignment -->
+            </div>
+        </div>
+
+        <button type="submit" style="background: #f39c12; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Update Faculty</button>
+        <a href="/faculty" style="margin-left: 10px; color: #3498db;">Cancel</a>
+    </form>
+</div>
+
+<!-- Auto-calculate overall experience and category with INTEGER calculation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateOfJoiningInput = document.querySelector('input[name="date_of_joining"]');
+    const pragatiInput = document.querySelector('input[name="teaching_exp_pragati"]');
+    const otherInput = document.querySelector('input[name="teaching_exp_other"]');
+    const industrialInput = document.querySelector('input[name="industrial_exp"]');
+    const overallInput = document.querySelector('input[name="overall_exp"]');
+    const categoryDisplay = document.getElementById('experienceCategoryDisplay');
+    const categoryInput = document.getElementById('experienceCategoryInput');
+    
+    function calculatePragatiExperience() {
+        if (!dateOfJoiningInput.value) return 0;
+        
+        const joinDate = new Date(dateOfJoiningInput.value);
+        const currentDate = new Date();
+        
+        // Calculate difference in years with decimal precision
+        const diffTime = currentDate - joinDate;
+        const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25);
+        
+        // Return 0 if future date, otherwise return calculated years
+        return diffYears > 0 ? Math.round(diffYears * 10) / 10 : 0;
+    }
+    
+    function calculateOverallAndCategory() {
+        // Auto-calculate Pragati experience
+        const pragatiExp = calculatePragatiExperience();
+        pragatiInput.value = pragatiExp.toFixed(1);
+        
+        const other = parseFloat(otherInput.value) || 0;
+        const industrial = parseFloat(industrialInput.value) || 0;
+        
+        const overall = pragatiExp + other + industrial;
+        overallInput.value = overall.toFixed(1);
+        
+        // Auto-determine experience category using INTEGER values (5.9 = 5 years)
+        const overallInteger = Math.floor(overall); // Convert to integer (5.9 becomes 5)
+        let category, bgColor, text;
+        
+        if (overall <= 5.9) {
+        category = '0-5';
+        bgColor = '#e74c3c'; // Red
+        text = '0-5 Years (up to 5.9)';
+    } else if (overall <= 10.9) {
+        category = '6-10';
+        bgColor = '#f39c12'; // Orange
+        text = '6-10 Years (up to 10.9)';
+    } else {
+        category = '10+';
+        bgColor = '#27ae60'; // Green
+        text = '10+ Years (above 10)';
+    }
+        
+        // Update display
+        categoryDisplay.textContent = text;
+        categoryDisplay.style.backgroundColor = bgColor;
+        categoryInput.value = category;
+    }
+    
+    // Event listeners
+    dateOfJoiningInput.addEventListener('change', calculateOverallAndCategory);
+    dateOfJoiningInput.addEventListener('input', calculateOverallAndCategory);
+    otherInput.addEventListener('input', calculateOverallAndCategory);
+    industrialInput.addEventListener('input', calculateOverallAndCategory);
+    
+    // Calculate on page load
+    calculateOverallAndCategory();
+    
+    // Add info tooltip for Pragati experience
+    const pragatiContainer = pragatiInput.parentElement;
+    const infoText = document.createElement('small');
+    infoText.style.color = '#7f8c8d';
+    infoText.style.display = 'block';
+    infoText.style.marginTop = '5px';
+    infoText.innerHTML = '🔄 Auto-calculated from Date of Joining';
+    pragatiContainer.appendChild(infoText);
+
+    // Add info tooltip for overall experience
+    const overallContainer = overallInput.parentElement;
+    const overallInfoText = document.createElement('small');
+    overallInfoText.style.color = '#7f8c8d';
+    overallInfoText.style.display = 'block';
+    overallInfoText.style.marginTop = '5px';
+    overallInfoText.innerHTML = '🔄 Auto-calculated (Pragati + Other + Industrial)';
+    overallContainer.appendChild(overallInfoText);
+
+    // Add info tooltip for experience category
+    const categoryContainer = categoryDisplay.parentElement;
+    const categoryInfoText = document.createElement('small');
+    categoryInfoText.style.color = '#7f8c8d';
+    categoryInfoText.style.display = 'block';
+    categoryInfoText.style.marginTop = '5px';
+    categoryInfoText.innerHTML = '📊 Based on integer years (5.9 = 5 years)';
+    categoryContainer.appendChild(categoryInfoText);
+});
+</script>
+{% endblock %}

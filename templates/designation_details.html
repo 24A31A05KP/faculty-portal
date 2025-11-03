@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>💼 {{ designation_name }}</h2>
+        <a href="/" class="btn" style="background: #3498db;">← Back to Dashboard</a>
+    </div>
+
+    <!-- Designation Statistics -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; text-align: center;">
+            <h3 style="color: #2c3e50; margin-bottom: 10px;">Total Faculty</h3>
+            <div style="font-size: 2rem; font-weight: bold; color: #3498db;">{{ stats.total }}</div>
+        </div>
+        <div style="background: #d4edda; padding: 15px; border-radius: 8px; text-align: center;">
+            <h3 style="color: #155724; margin-bottom: 10px;">👨 Male</h3>
+            <div style="font-size: 2rem; font-weight: bold; color: #28a745;">{{ stats.male_count }}</div>
+        </div>
+        <div style="background: #f8d7da; padding: 15px; border-radius: 8px; text-align: center;">
+            <h3 style="color: #721c24; margin-bottom: 10px;">👩 Female</h3>
+            <div style="font-size: 2rem; font-weight: bold; color: #dc3545;">{{ stats.female_count }}</div>
+        </div>
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">
+            <h3 style="color: #856404; margin-bottom: 10px;">🏫 Departments</h3>
+            <div style="font-size: 2rem; font-weight: bold; color: #ffc107;">{{ stats.department_count }}</div>
+        </div>
+    </div>
+
+    <!-- Department Distribution for this Designation -->
+    <h3 style="margin-bottom: 20px;">📊 Department Distribution</h3>
+    {% if department_stats %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            {% for dept_stat in department_stats %}
+            <a href="/faculty?designation={{ designation_name|urlencode }}&department={{ dept_stat.department|urlencode }}" 
+               style="text-decoration: none; display: block;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                           color: white; padding: 20px; border-radius: 10px; 
+                           transition: all 0.3s ease; border: 2px solid transparent;"
+                     onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#3498db';" 
+                     onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='transparent';">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">
+                                🏫 {{ dept_stat.department }}
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">
+                                {{ dept_stat.total }} {{ designation_name }}{% if dept_stat.total != 1 %}s{% endif %}
+                            </div>
+                            <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">
+                                👨 {{ dept_stat.male_count }} | 👩 {{ dept_stat.female_count }}
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 20px; font-size: 16px; font-weight: bold;">
+                            👉
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+            <h3>No Departments Found</h3>
+            <p>No faculty members found for this designation.</p>
+        </div>
+    {% endif %}
+
+    <!-- Faculty List -->
+    <h3 style="margin-bottom: 20px;">Faculty Members</h3>
+    
+    {% if faculty %}
+    <div class="table-container">
+        <table class="faculty-table">
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Experience</th>
+                    <th>Ratified</th>
+                    <th>Gender</th>
+                    <th>Appointment</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in faculty %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <strong>{{ member.name_ssc }}</strong>
+                        <br><small style="color: #7f8c8d;">{{ member.employee_id }}</small>
+                    </td>
+                    <td>
+                        <a href="/faculty?designation={{ designation_name|urlencode }}&department={{ member.department|urlencode }}" 
+                           style="color: #3498db; text-decoration: none; font-weight: bold;">
+                            🏫 {{ member.department }}
+                        </a>
+                    </td>
+                    <td>
+                        <span style="background: 
+                            {% if member.experience_category == '0-5' %}#e74c3c
+                            {% elif member.experience_category == '6-10' %}#f39c12
+                            {% else %}#27ae60{% endif %}; 
+                            color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                            {{ member.experience_category }} years
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: {% if member.ratified == 'Yes' %}#27ae60{% else %}#e74c3c{% endif %}; 
+                            color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                            {{ member.ratified }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if member.gender == 'M' %}👨 Male
+                        {% elif member.gender == 'F' %}👩 Female
+                        {% else %}⚧ Other
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="background: 
+                            {% if member.appointment_type == 'Regular' %}#27ae60
+                            {% elif member.appointment_type == 'Visiting' %}#3498db
+                            {% else %}#7f8c8d{% endif %}; 
+                            color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                            {{ member.appointment_type }}
+                        </span>
+                    </td>
+                    <td>{{ member.email }}</td>
+                    <td>
+    <div style="display: flex; gap: 5px;">
+        {% if session.role in ['admin', 'editor', 'Admin', 'Editor', 'IQAC', 'Office'] %}
+            <!-- Admin roles can view anyone -->
+            <a href="/faculty/{{ member.id }}" style="background: #2ecc71; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">View</a>
+            <a href="/edit_faculty/{{ member.id }}" style="background: #f39c12; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">Edit</a>
+        {% elif session.role == 'Faculty' and member.email == session.email %}
+            <!-- Faculty can only view/edit their own profile -->
+            <a href="/faculty/{{ member.id }}" style="background: #2ecc71; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">View</a>
+        {% else %}
+            <!-- Faculty viewing other faculty - no actions -->
+            <span style="color: #95a5a6; font-size: 11px;">No Access</span>
+        {% endif %}
+    </div>
+</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #7f8c8d;">No Faculty Members with {{ designation_name }} Designation</h3>
+        <p style="color: #95a5a6;">Faculty members will appear here when they have this designation.</p>
+        {% if session.role in ['admin', 'editor', 'Admin', 'Editor'] %}
+        <a href="/add_faculty" class="btn" style="background: #3498db; margin-top: 20px;">Add Faculty</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.faculty-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.faculty-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+.faculty-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+.faculty-table tr:hover {
+    background: #f8f9fa;
+}
+</style>
+{% endblock %}

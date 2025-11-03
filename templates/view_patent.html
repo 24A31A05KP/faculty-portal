@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>⚖️ Patent Details</h2>
+        <a href="/faculty/{{ patent.faculty_id }}/publications" class="btn" style="background: #3498db;">← Back to R&D</a>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 25px; border-radius: 10px;">
+        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">{{ patent.patent_title }}</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div>
+                <h4>Patent Information</h4>
+                <p><strong>Application Number:</strong> {{ patent.patent_application_number }}</p>
+                <p><strong>Patent Office:</strong> {{ patent.patent_office }}</p>
+                <p><strong>Status:</strong> 
+                    <span style="background: 
+                        {% if patent.status == 'Granted' %}#27ae60
+                        {% elif patent.status == 'Published' %}#f39c12
+                        {% else %}#3498db{% endif %}; 
+                        color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                        {{ patent.status }}
+                    </span>
+                </p>
+                <p><strong>Type:</strong> 
+                    <span style="background: 
+                        {% if patent.patent_type == 'International' %}#e74c3c
+                        {% else %}#9b59b6{% endif %}; 
+                        color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                        {{ patent.patent_type }}
+                    </span>
+                </p>
+            </div>
+            
+            <div>
+                <h4>Dates & Inventors</h4>
+                <p><strong>Filing Date:</strong> {{ patent.filing_date or 'N/A' }}</p>
+                <p><strong>Publication Date:</strong> {{ patent.publication_date or 'N/A' }}</p>
+                <p><strong>Grant Date:</strong> {{ patent.grant_date or 'Not granted yet' }}</p>
+                <p><strong>Inventors:</strong> {{ patent.inventors }}</p>
+                <p><strong>Corresponding Applicant:</strong> {{ patent.corresponding_applicant }}</p>
+                <p><strong>Faculty Position:</strong> {{ patent.faculty_author_position }}</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            {% if patent.patent_link %}
+            <p><strong>Patent Link:</strong> <a href="{{ patent.patent_link }}" target="_blank">{{ patent.patent_link }}</a></p>
+            {% endif %}
+            {% if patent.certificate_link %}
+            <p><strong>Certificate Link:</strong> <a href="{{ patent.certificate_link }}" target="_blank">{{ patent.certificate_link }}</a></p>
+            {% endif %}
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 5px;">
+            <p><strong>Faculty:</strong> {{ patent.name_ssc }} ({{ patent.faculty_department }})</p>
+            <p><strong>Department:</strong> {{ patent.department }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

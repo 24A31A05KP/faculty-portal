@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Qualifications for {{ faculty.name_ssc }}</h2>
+        <a href="/faculty" class="btn" style="background: #3498db;">Back</a>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3>Faculty Details</h3>
+        <p><strong>Employee ID:</strong> {{ faculty.employee_id }}</p>
+        <p><strong>Department:</strong> {{ faculty.department }}</p>
+        <p><strong>Designation:</strong> {{ faculty.designation }}</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+        {% if session.role in ['admin', 'editor', 'Admin', 'Editor', 'IQAC', 'Office'] %}
+        {% endif %}
+        
+        <a href="/download_qualifications/{{ faculty.id }}" class="btn" style="background: #3498db; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
+            📥 Download All
+        </a>
+    </div>
+
+    {% if session.role in ['admin', 'editor', 'Admin', 'Editor', 'IQAC', 'Office'] %}
+    <!-- QUALIFICATION FORM CONTAINER -->
+    <div id="qualification-form-container" style="border: 2px dashed #3498db; padding: 20px; border-radius: 10px; margin: 20px 0; background: #f8f9fa;">
+        <h3 id="add-qualification-form">Add New Qualification</h3>
+        <form method="POST" action="/add_qualification/{{ faculty.id }}" id="qualification-form">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Qualification Type:*</label>
+                    <select name="qualification_type" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">Select Type</option>
+                        <option value="SSC">SSC</option>
+                        <option value="Inter">Inter</option>
+                        <option value="Degree">Degree</option>
+                        <option value="PG">Post Graduate</option>
+                        <option value="Ph.D">Ph.D</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Domain/Specialization:</label>
+                    <input type="text" name="domain_specialization" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Percentage/CGPA:</label>
+                    <input type="number" step="0.01" name="percentage" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Year of Passing:*</label>
+                    <input type="number" name="year_of_passing" min="1950" max="2030" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Institution Name:*</label>
+                    <input type="text" name="institution_name" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Options:</label>
+                    <div style="display: flex; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" name="highest_degree">
+                            Highest Degree
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" name="pursuing">
+                            Pursuing
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" style="background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Add Qualification</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <h3>Existing Qualifications</h3>
+    
+    {% if qualifications %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background: #34495e; color: white;">
+                <th style="padding: 12px; text-align: left;">Qualification</th>
+                <th style="padding: 12px; text-align: left;">Specialization</th>
+                <th style="padding: 12px; text-align: left;">Percentage</th>
+                <th style="padding: 12px; text-align: left;">Year</th>
+                <th style="padding: 12px; text-align: left;">Institution</th>
+                <th style="padding: 12px; text-align: left;">Status</th>
+                {% if session.role in ['admin', 'editor', 'Admin', 'Editor', 'IQAC', 'Office'] %}
+                <th style="padding: 12px; text-align: left;">Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for qual in qualifications %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 12px;">{{ qual.qualification_type }}</td>
+                <td style="padding: 12px;">{{ qual.domain_specialization or '-' }}</td>
+                <td style="padding: 12px;">{{ qual.percentage or '-' }}</td>
+                <td style="padding: 12px;">{{ qual.year_of_passing }}</td>
+                <td style="padding: 12px;">{{ qual.institution_name }}</td>
+                <td style="padding: 12px;">
+                    {% if qual.highest_degree %}<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">Highest</span>{% endif %}
+                    {% if qual.pursuing %}<span style="background: #3498db; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">Pursuing</span>{% endif %}
+                </td>
+                {% if session.role in ['admin', 'editor', 'Admin', 'Editor', 'IQAC', 'Office'] %}
+                <td style="padding: 12px;">
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <!-- Edit Button -->
+                        <a href="/edit_qualification/{{ qual.id }}" style="background: #f39c12; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px; font-weight: bold;">✏️ Edit</a>
+                        <!-- Delete Button -->
+                        <a href="/delete_qualification/{{ qual.id }}" style="background: #e74c3c; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px; font-weight: bold;" onclick="return confirm('Are you sure you want to delete this qualification?')">🗑️ Delete</a>
+                    </div>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 5px;">
+        <p style="color: #7f8c8d;">No qualifications added yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function scrollToForm() {
+    const formContainer = document.getElementById('qualification-form-container');
+    if (formContainer) {
+        formContainer.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+        
+        // Add visual highlight
+        formContainer.style.boxShadow = '0 0 0 3px #27ae60';
+        formContainer.style.transition = 'box-shadow 0.3s ease';
+        
+        // Remove highlight after 2 seconds
+        setTimeout(() => {
+            formContainer.style.boxShadow = 'none';
+        }, 2000);
+    }
+}
+</script>
+{% endblock %}
