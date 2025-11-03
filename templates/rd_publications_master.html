@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>
+            {% if publication_type == 'journal' %}📚 Journal Publications
+            {% elif publication_type == 'conference' %}🎤 Conference Papers
+            {% elif publication_type == 'book_chapter' %}📖 Book Chapters
+            {% elif publication_type == 'patent' %}⚖️ Patents
+            {% endif %}
+        </h2>
+        <div style="display: flex; gap: 10px;">
+            <a href="/rd/download_excel?type={{ publication_type }}&department={{ selected_department }}&year={{ selected_year }}&indexing={{ selected_indexing }}&status={{ selected_status }}" 
+               class="btn" style="background: #27ae60;">
+                📥 Download Excel
+            </a>
+            <a href="/" class="btn" style="background: #3498db;">← Dashboard</a>
+        </div>
+    </div>
+
+<!-- Filters Section -->
+<div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <h4 style="margin-bottom: 15px;">🔍 Search & Filter</h4>
+    <form method="GET" action="/rd/publications">
+        <input type="hidden" name="type" value="{{ publication_type }}">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; align-items: end;">
+            <!-- Department Filter -->
+            <div>
+                <label>Department:</label>
+                <select name="department" onchange="this.form.submit()">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Year Filter - Manual Input -->
+            <div>
+                <label>Year:</label>
+                <input type="number" name="year" value="{{ selected_year }}" 
+                       placeholder="e.g., 2024" min="2000" max="2030"
+                       onchange="this.form.submit()">
+            </div>
+            
+            <!-- Additional Filters based on publication type -->
+            {% if publication_type == 'journal' %}
+            <div>
+                <label>Indexing:</label>
+                <select name="indexing" onchange="this.form.submit()">
+                    <option value="">All Indexing</option>
+                    {% for idx in indexings %}
+                    <option value="{{ idx }}" {% if selected_indexing == idx %}selected{% endif %}>{{ idx }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% elif publication_type == 'patent' %}
+            <div>
+                <label>Status:</label>
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">All Status</option>
+                    {% for stat in patent_statuses %}
+                    <option value="{{ stat }}" {% if selected_status == stat %}selected{% endif %}>{{ stat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            
+            <!-- Clear Filters -->
+            <div>
+                <a href="/rd/publications?type={{ publication_type }}" class="btn" style="background: #95a5a6;">Clear Filters</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+    <!-- Statistics -->
+    <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="font-size: 16px; font-weight: bold; color: #2c3e50;">
+                📊 Total Records: <span style="color: #e74c3c;">{{ stats.total }}</span>
+            </div>
+            {% if selected_department or selected_year or selected_indexing or selected_status %}
+            <div style="font-size: 14px; color: #7f8c8d;">
+                <strong>Active Filters:</strong>
+                {% if selected_department %} Department: {{ selected_department }}{% endif %}
+                {% if selected_year %} | Year: {{ selected_year }}{% endif %}
+                {% if selected_indexing %} | Indexing: {{ selected_indexing }}{% endif %}
+                {% if selected_status %} | Status: {{ selected_status }}{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Publications Table -->
+    {% if publications %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Employee ID</th>
+                    <th>Faculty Name</th>
+                    <th>Department</th>
+                    {% if publication_type == 'journal' %}
+                    <th>Paper Title</th>
+                    <th>Journal Name</th>
+                    <th>Year</th>
+                    <th>Indexing</th>
+                    <th>Impact Factor</th>
+                    {% elif publication_type == 'conference' %}
+                    <th>Paper Title</th>
+                    <th>Conference Name</th>
+                    <th>Year</th>
+                    <th>Venue</th>
+                    {% elif publication_type == 'book_chapter' %}
+                    <th>Chapter Title</th>
+                    <th>Book Title</th>
+                    <th>Year</th>
+                    <th>Publisher</th>
+                    {% elif publication_type == 'patent' %}
+                    <th>Patent Title</th>
+                    <th>Application No</th>
+                    <th>Status</th>
+                    <th>Filing Date</th>
+                    {% endif %}
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pub in publications %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ pub.employee_id }}</td>
+                    <td>{{ pub.name_ssc }}</td>
+                    <td>{{ pub.department }}</td>
+                    
+                    {% if publication_type == 'journal' %}
+                    <td>
+                        <strong>{{ pub.paper_title_apa[:80] }}{% if pub.paper_title_apa|length > 80 %}...{% endif %}</strong>
+                        {% if pub.doi %}<br><small>DOI: {{ pub.doi }}</small>{% endif %}
+                    </td>
+                    <td>{{ pub.journal_name }}</td>
+                    <td>{{ pub.year_of_publication }}</td>
+                    <td>
+                        {% if pub.indexing %}
+                        <span class="badge">{{ pub.indexing }}</span>
+                        {% if pub.quartile %}
+                        <span class="badge" style="background: #e74c3c;">{{ pub.quartile }}</span>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if pub.impact_factor and pub.impact_factor > 0 %}
+                        <span class="badge" style="background: #27ae60;">{{ "%.3f"|format(pub.impact_factor) }}</span>
+                        {% else %}
+                        <span class="badge" style="background: #95a5a6;">N/A</span>
+                        {% endif %}
+                    </td>
+                    
+                    {% elif publication_type == 'conference' %}
+                    <td>
+                        <strong>{{ pub.paper_title[:80] }}{% if pub.paper_title|length > 80 %}...{% endif %}</strong>
+                        {% if pub.doi %}<br><small>DOI: {{ pub.doi }}</small>{% endif %}
+                    </td>
+                    <td>{{ pub.conference_name }}</td>
+                    <td>{{ pub.year_of_publication }}</td>
+                    <td>{{ pub.conference_venue or 'N/A' }}</td>
+                    
+                    {% elif publication_type == 'book_chapter' %}
+                    <td>
+                        <strong>{{ pub.chapter_title[:80] }}{% if pub.chapter_title|length > 80 %}...{% endif %}</strong>
+                        {% if pub.chapter_doi %}<br><small>DOI: {{ pub.chapter_doi }}</small>{% endif %}
+                    </td>
+                    <td>{{ pub.book_title }}</td>
+                    <td>{{ pub.year_of_publication }}</td>
+                    <td>{{ pub.publisher }}</td>
+                    
+                    {% elif publication_type == 'patent' %}
+                    <td>
+                        <strong>{{ pub.patent_title[:80] }}{% if pub.patent_title|length > 80 %}...{% endif %}</strong>
+                    </td>
+                    <td>{{ pub.patent_application_number }}</td>
+                    <td>
+                        <span class="badge" style="background: 
+                            {% if pub.status == 'Granted' %}#27ae60
+                            {% elif pub.status == 'Published' %}#f39c12
+                            {% else %}#3498db{% endif %}">
+                            {{ pub.status }}
+                        </span>
+                    </td>
+                    <td>{{ pub.filing_date or 'N/A' }}</td>
+                    {% endif %}
+                    
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            {% if publication_type == 'journal' %}
+                            <button class="btn-small view-btn" onclick="viewJournal({{ pub.id }})">View</button>
+                            {% elif publication_type == 'conference' %}
+                            <button class="btn-small view-btn" onclick="viewConference({{ pub.id }})">View</button>
+                            {% elif publication_type == 'book_chapter' %}
+                            <button class="btn-small view-btn" onclick="viewBookChapter({{ pub.id }})">View</button>
+                            {% elif publication_type == 'patent' %}
+                            <button class="btn-small view-btn" onclick="viewPatent({{ pub.id }})">View</button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 10px;">
+        <h4 style="color: #7f8c8d;">No Publications Found</h4>
+        <p style="color: #95a5a6;">
+            {% if selected_department or selected_year or selected_indexing or selected_status %}
+            Try adjusting your filters or <a href="/rd/publications?type={{ publication_type }}">clear all filters</a>.
+            {% else %}
+            No {{ publication_type }} publications found in the system.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    margin: 1px;
+    display: inline-block;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.view-btn { background: #3498db; color: white; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.data-table tr:hover {
+    background: #f8f9fa;
+}
+
+select, input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+</style>
+
+<script>
+function viewJournal(id) {
+    window.location.href = '/view_journal/' + id;
+}
+
+function viewConference(id) {
+    window.location.href = '/view_conference/' + id;
+}
+
+function viewBookChapter(id) {
+    window.location.href = '/view_book_chapter/' + id;
+}
+
+function viewPatent(id) {
+    window.location.href = '/view_patent/' + id;
+}
+</script>
+{% endblock %}

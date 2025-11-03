@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>✏️ Edit Conference Publication</h2>
+        <a href="/faculty/{{ conference.faculty_id }}/publications" class="btn" style="background: #3498db;">← Back to R&D</a>
+    </div>
+
+    <form method="POST" style="background: #f8f9fa; padding: 25px; border-radius: 10px;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Department:*</label>
+                <select name="department" required>
+                    <option value="">Select Department</option>
+                    <option value="CIVIL" {% if conference.department == 'CIVIL' %}selected{% endif %}>CIVIL</option>
+                    <option value="EEE" {% if conference.department == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if conference.department == 'MECH' %}selected{% endif %}>MECH</option>
+                    <option value="ECE" {% if conference.department == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="CSE" {% if conference.department == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="CSE-AI" {% if conference.department == 'CSE-AI' %}selected{% endif %}>CSE-AI</option>
+                    <option value="CSE-DS" {% if conference.department == 'CSE-DS' %}selected{% endif %}>CSE-DS</option>
+                    <option value="CSE-AI&ML" {% if conference.department == 'CSE-AI&ML' %}selected{% endif %}>CSE-AI&ML</option>
+                    <option value="CSE-CS" {% if conference.department == 'CSE-CS' %}selected{% endif %}>CSE-CS</option>
+                    <option value="IT" {% if conference.department == 'IT' %}selected{% endif %}>IT</option>
+                </select>
+            </div>
+            <div>
+                <label>Paper Title:*</label>
+                <input type="text" name="paper_title" value="{{ conference.paper_title }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Authors:*</label>
+                <textarea name="authors" required placeholder="Enter all authors separated by commas">{{ conference.authors }}</textarea>
+            </div>
+            <div>
+                <label>Corresponding Author:*</label>
+                <input type="text" name="corresponding_author" value="{{ conference.corresponding_author }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Faculty Author Position:*</label>
+                <select name="faculty_author_position" required>
+                    <option value="">Select Position</option>
+                    <option value="First Author" {% if conference.faculty_author_position == 'First Author' %}selected{% endif %}>First Author</option>
+                    <option value="Second Author" {% if conference.faculty_author_position == 'Second Author' %}selected{% endif %}>Second Author</option>
+                    <option value="Corresponding Author" {% if conference.faculty_author_position == 'Corresponding Author' %}selected{% endif %}>Corresponding Author</option>
+                    <option value="Co-author" {% if conference.faculty_author_position == 'Co-author' %}selected{% endif %}>Co-author</option>
+                </select>
+            </div>
+            <div>
+                <label>Conference Name:*</label>
+                <input type="text" name="conference_name" value="{{ conference.conference_name }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Conference Venue:</label>
+                <input type="text" name="conference_venue" value="{{ conference.conference_venue or '' }}" placeholder="e.g., Virtual, London, etc.">
+            </div>
+            <div>
+                <label>Conference Dates:</label>
+                <input type="text" name="conference_dates" value="{{ conference.conference_dates or '' }}" placeholder="e.g., 15-17 March 2024">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Proceedings Title:</label>
+                <input type="text" name="proceedings_title" value="{{ conference.proceedings_title or '' }}">
+            </div>
+            <div>
+                <label>ISBN/ISSN Number:</label>
+                <input type="text" name="isbn_issn" value="{{ conference.isbn_issn or '' }}">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>DOI:</label>
+                <input type="text" name="doi" value="{{ conference.doi or '' }}">
+            </div>
+            <div>
+                <label>Year of Publication:*</label>
+                <input type="number" name="year_of_publication" value="{{ conference.year_of_publication }}" min="1900" max="2030" required>
+            </div>
+            <div>
+                <label>Indexing:</label>
+                <select name="indexing">
+                    <option value="">Select Indexing</option>
+                    <option value="Scopus" {% if conference.indexing == 'Scopus' %}selected{% endif %}>Scopus</option>
+                    <option value="SCI" {% if conference.indexing == 'SCI' %}selected{% endif %}>SCI</option>
+                    <option value="WoS" {% if conference.indexing == 'WoS' %}selected{% endif %}>Web of Science</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Publisher:</label>
+                <input type="text" name="publisher" value="{{ conference.publisher or '' }}">
+            </div>
+            <div>
+                <label>Conference Link:</label>
+                <input type="url" name="conference_link" value="{{ conference.conference_link or '' }}" placeholder="https://">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn" style="background: #27ae60;">Update Conference Paper</button>
+            <a href="/faculty/{{ conference.faculty_id }}/publications" class="btn" style="background: #95a5a6;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+</style>
+{% endblock %}

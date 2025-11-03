@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>✏️ Edit Journal Publication</h2>
+        <a href="/faculty/{{ journal.faculty_id }}/publications" class="btn" style="background: #3498db;">← Back to R&D</a>
+    </div>
+
+    <form method="POST" style="background: #f8f9fa; padding: 25px; border-radius: 10px;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Department:*</label>
+                <select name="department" required>
+                    <option value="">Select Department</option>
+                    <option value="CIVIL" {% if journal.department == 'CIVIL' %}selected{% endif %}>CIVIL</option>
+                    <option value="EEE" {% if journal.department == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if journal.department == 'MECH' %}selected{% endif %}>MECH</option>
+                    <option value="ECE" {% if journal.department == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="CSE" {% if journal.department == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="CSE-AI" {% if journal.department == 'CSE-AI' %}selected{% endif %}>CSE-AI</option>
+                    <option value="CSE-DS" {% if journal.department == 'CSE-DS' %}selected{% endif %}>CSE-DS</option>
+                    <option value="CSE-AI&ML" {% if journal.department == 'CSE-AI&ML' %}selected{% endif %}>CSE-AI&ML</option>
+                    <option value="CSE-CS" {% if journal.department == 'CSE-CS' %}selected{% endif %}>CSE-CS</option>
+                    <option value="IT" {% if journal.department == 'IT' %}selected{% endif %}>IT</option>
+                </select>
+            </div>
+            <div>
+                <label>First Author:*</label>
+                <input type="text" name="first_author" value="{{ journal.first_author }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Corresponding Author:*</label>
+                <input type="text" name="corresponding_author" value="{{ journal.corresponding_author }}" required>
+            </div>
+            <div>
+                <label>Faculty Author Position:*</label>
+                <select name="faculty_author_position" required>
+                    <option value="">Select Position</option>
+                    <option value="First Author" {% if journal.faculty_author_position == 'First Author' %}selected{% endif %}>First Author</option>
+                    <option value="Second Author" {% if journal.faculty_author_position == 'Second Author' %}selected{% endif %}>Second Author</option>
+                    <option value="Corresponding Author" {% if journal.faculty_author_position == 'Corresponding Author' %}selected{% endif %}>Corresponding Author</option>
+                    <option value="Co-author" {% if journal.faculty_author_position == 'Co-author' %}selected{% endif %}>Co-author</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Other Authors:</label>
+            <textarea name="other_authors" placeholder="Enter other authors separated by commas">{{ journal.other_authors or '' }}</textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Journal Paper (APA format):*</label>
+            <textarea name="paper_title_apa" required placeholder="Enter paper title in APA format">{{ journal.paper_title_apa }}</textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Journal Name:*</label>
+                <input type="text" name="journal_name" value="{{ journal.journal_name }}" required>
+            </div>
+            <div>
+                <label>Volume & Issue:</label>
+                <input type="text" name="volume_issue" value="{{ journal.volume_issue or '' }}" placeholder="e.g., Vol. 12, Issue 3">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Page Numbers:</label>
+                <input type="text" name="page_numbers" value="{{ journal.page_numbers or '' }}" placeholder="e.g., 123-135">
+            </div>
+            <div>
+                <label>ISSN Number:</label>
+                <input type="text" name="issn_number" value="{{ journal.issn_number or '' }}">
+            </div>
+            <div>
+                <label>DOI:</label>
+                <input type="text" name="doi" value="{{ journal.doi or '' }}">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Year of Publication:*</label>
+                <input type="number" name="year_of_publication" value="{{ journal.year_of_publication }}" min="1900" max="2030" required>
+            </div>
+            <div>
+                <label>Indexing:</label>
+                <select name="indexing">
+                    <option value="">Select Indexing</option>
+                    <option value="Scopus" {% if journal.indexing == 'Scopus' %}selected{% endif %}>Scopus</option>
+                    <option value="SCI" {% if journal.indexing == 'SCI' %}selected{% endif %}>SCI</option>
+                    <option value="SCIE" {% if journal.indexing == 'SCIE' %}selected{% endif %}>SCIE</option>
+                    <option value="WoS" {% if journal.indexing == 'WoS' %}selected{% endif %}>Web of Science</option>
+                </select>
+            </div>
+            <div>
+                <label>Quartile:</label>
+                <select name="quartile">
+                    <option value="">Select Quartile</option>
+                    <option value="Q1" {% if journal.quartile == 'Q1' %}selected{% endif %}>Q1</option>
+                    <option value="Q2" {% if journal.quartile == 'Q2' %}selected{% endif %}>Q2</option>
+                    <option value="Q3" {% if journal.quartile == 'Q3' %}selected{% endif %}>Q3</option>
+                    <option value="Q4" {% if journal.quartile == 'Q4' %}selected{% endif %}>Q4</option>
+                </select>
+            </div>
+            <div>
+                <label>Impact Factor:</label>
+                <input type="number" name="impact_factor" value="{{ journal.impact_factor or 0 }}" step="0.001" placeholder="0.000">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Journal Link:</label>
+                <input type="url" name="journal_link" value="{{ journal.journal_link or '' }}" placeholder="https://">
+            </div>
+            <div>
+                <label>Publisher:</label>
+                <input type="text" name="publisher" value="{{ journal.publisher or '' }}">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label>Funding Agency:</label>
+                <input type="text" name="funding_agency" value="{{ journal.funding_agency or '' }}">
+            </div>
+            <div>
+                <label>Remarks:</label>
+                <input type="text" name="remarks" value="{{ journal.remarks or '' }}">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn" style="background: #27ae60;">Update Publication</button>
+            <a href="/faculty/{{ journal.faculty_id }}/publications" class="btn" style="background: #95a5a6;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+</style>
+{% endblock %}

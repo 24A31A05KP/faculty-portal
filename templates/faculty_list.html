@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>{% if user_role in ['Faculty'] %}👤 My Profile{% else %}Faculty Members{% endif %}</h2>
+        {% if user_role in ['IQAC', 'Office'] %}
+        <a href="/add_faculty" class="btn" style="background: #27ae60;">Add New Faculty</a>
+        {% endif %}
+    </div>
+
+    <!-- 🔒 ROLE-BASED MESSAGES -->
+    {% if user_role in ['IQAC', 'Office'] %}
+    <!-- IQAC/Office sees search filters -->
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px; color: #2c3e50;">Search & Filter</h3>
+        <form method="GET" action="/faculty" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Search Name/ID:</label>
+                <input type="text" name="search" value="{{ request.args.get('search', '') }}" placeholder="Name or Employee ID" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Department:</label>
+                <select name="department" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">All Departments</option>
+                    <option value="CIVIL" {% if request.args.get('department') == 'CIVIL' %}selected{% endif %}>CIVIL</option>
+                    <option value="EEE" {% if request.args.get('department') == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if request.args.get('department') == 'MECH' %}selected{% endif %}>MECH</option>
+                    <option value="ECE" {% if request.args.get('department') == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="CSE" {% if request.args.get('department') == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="CSE-AI" {% if request.args.get('department') == 'CSE-AI' %}selected{% endif %}>CSE-AI</option>
+                    <option value="CSE-DS" {% if request.args.get('department') == 'CSE-DS' %}selected{% endif %}>CSE-DS</option>
+                    <option value="CSE-AI&ML" {% if request.args.get('department') == 'CSE-AI&ML' %}selected{% endif %}>CSE-AI&ML</option>
+                    <option value="CSE-CS" {% if request.args.get('department') == 'CSE-CS' %}selected{% endif %}>CSE-CS</option>
+                    <option value="IT" {% if request.args.get('department') == 'IT' %}selected{% endif %}>IT</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Designation:</label>
+                <select name="designation" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">All Designations</option>
+                    <option value="Professor" {% if request.args.get('designation') == 'Professor' %}selected{% endif %}>Professor</option>
+                    <option value="Associate Professor" {% if request.args.get('designation') == 'Associate Professor' %}selected{% endif %}>Associate Professor</option>
+                    <option value="Assistant Professor" {% if request.args.get('designation') == 'Assistant Professor' %}selected{% endif %}>Assistant Professor</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Appointment Type:</label>
+                <select name="appointment_type" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">All Types</option>
+                    <option value="Regular" {% if request.args.get('appointment_type') == 'Regular' %}selected{% endif %}>Regular</option>
+                    <option value="Visiting" {% if request.args.get('appointment_type') == 'Visiting' %}selected{% endif %}>Visiting</option>
+                    <option value="Adhoc" {% if request.args.get('appointment_type') == 'Adhoc' %}selected{% endif %}>Adhoc</option>
+                    <option value="Others" {% if request.args.get('appointment_type') == 'Others' %}selected{% endif %}>Others</option>
+                </select>
+            </div>
+            <!-- Experience Filter -->
+            <!-- Experience Range Filters -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 12px;">Experience From (yrs):</label>
+                    <input type="number" name="exp_from" value="{{ request.args.get('exp_from', '') }}" 
+                           placeholder="0" min="0" max="50" step="0.1"
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 12px;">Experience To (yrs):</label>
+                    <input type="number" name="exp_to" value="{{ request.args.get('exp_to', '') }}" 
+                           placeholder="50" min="0" max="50" step="0.1"
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button type="submit" style="background: #3498db; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+                <a href="/faculty" style="color: #7f8c8d; text-decoration: none;">Clear</a>
+            </div>
+        </form>
+
+        <!-- 📊 DOWNLOAD EXCEL BUTTONS SECTION -->
+        <div style="margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 8px; border-left: 4px solid #3498db;">
+            <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📊 Download Excel Reports</h4>
+            
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                <!-- Download ALL Faculty Data -->
+                <a href="/download_faculty_excel" 
+                   class="btn" 
+                   style="background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-flex; align-items: center; gap: 8px; font-weight: bold;">
+                    📥 Download Complete Faculty List
+                </a>
+                
+                <!-- Download FILTERED Data (only show if filters are active) -->
+{% if request.args.get('search') or request.args.get('department') or request.args.get('designation') or request.args.get('appointment_type') or request.args.get('exp_from') or request.args.get('exp_to') %}
+<a href="/download_faculty_excel?
+   {%- if request.args.get('search') -%}search={{ request.args.get('search')|urlencode }}&{%- endif -%}
+   {%- if request.args.get('department') -%}department={{ request.args.get('department')|urlencode }}&{%- endif -%}
+   {%- if request.args.get('designation') -%}designation={{ request.args.get('designation')|urlencode }}&{%- endif -%}
+   {%- if request.args.get('appointment_type') -%}appointment_type={{ request.args.get('appointment_type')|urlencode }}&{%- endif -%}
+   {%- if request.args.get('exp_from') -%}exp_from={{ request.args.get('exp_from')|urlencode }}&{%- endif -%}
+   {%- if request.args.get('exp_to') -%}exp_to={{ request.args.get('exp_to')|urlencode }}{%- endif -%}" 
+   class="btn" 
+   style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-flex; align-items: center; gap: 8px; font-weight: bold;">
+    🔍 Download Filtered Results ({{ faculty|length }} records)
+</a>
+{% endif %}
+            </div>
+            
+<!-- Download Info Text -->
+<div style="margin-top: 10px; font-size: 13px; color: #7f8c8d;">
+    {% if request.args.get('search') or request.args.get('department') or request.args.get('designation') or request.args.get('appointment_type') or request.args.get('exp_from') or request.args.get('exp_to') %}
+    <div>
+        <strong>Current Filters:</strong>
+        {% if request.args.get('search') %} <span style="background: #d4edda; padding: 2px 6px; border-radius: 3px; margin: 0 5px;">Search: "{{ request.args.get('search') }}"</span> {% endif %}
+        {% if request.args.get('department') %} <span style="background: #d1ecf1; padding: 2px 6px; border-radius: 3px; margin: 0 5px;">Department: {{ request.args.get('department') }}</span> {% endif %}
+        {% if request.args.get('designation') %} <span style="background: #fff3cd; padding: 2px 6px; border-radius: 3px; margin: 0 5px;">Designation: {{ request.args.get('designation') }}</span> {% endif %}
+        {% if request.args.get('appointment_type') %} <span style="background: #f8d7da; padding: 2px 6px; border-radius: 3px; margin: 0 5px;">Appointment: {{ request.args.get('appointment_type') }}</span> {% endif %}
+        {% if request.args.get('exp_from') or request.args.get('exp_to') %} 
+            <span style="background: #e2e3e5; padding: 2px 6px; border-radius: 3px; margin: 0 5px;">
+                Experience: {{ request.args.get('exp_from', '0') }} to {{ request.args.get('exp_to', '50') }} years
+            </span> 
+        {% endif %}
+    </div>
+    <div style="margin-top: 5px;">
+        💡 <strong>Tip:</strong> Use "Download Complete Faculty List" for all data, or "Download Filtered Results" for current search results.
+    </div>
+    {% else %}
+    <div>
+        💡 <strong>Tip:</strong> Use filters above to narrow down results, then download the filtered data.
+    </div>
+    {% endif %}
+</div>
+
+    <!-- Results Count (Only for IQAC/Office) -->
+    {% if faculty %}
+    <div style="background: #e8f4fd; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px;">
+        <strong>Found {{ faculty|length }} faculty member(s)</strong>
+        {% if request.args.get('search') or request.args.get('department') or request.args.get('appointment_type') or request.args.get('experience') %}
+        <span style="color: #7f8c8d; margin-left: 10px;">
+            {% if request.args.get('search') %}Search: "{{ request.args.get('search') }}"{% endif %}
+            {% if request.args.get('department') %} | Department: {{ request.args.get('department') }}{% endif %}
+            {% if request.args.get('designation') %} | Designation: {{ request.args.get('designation') }}{% endif %}
+            {% if request.args.get('appointment_type') %} | Type: {{ request.args.get('appointment_type') }}{% endif %}
+            {% if request.args.get('experience') %} | Experience: {{ request.args.get('experience') }} years{% endif %}
+        </span>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if faculty %}
+    <div class="table-container">
+        <table class="faculty-table">
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Total Exp</th>
+                    <th>Pragati Exp</th>
+                    <th>Appointment Type</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in faculty %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ member.employee_id }}</td>
+                    <td>{{ member.name_ssc }}</td>
+                    <td>{{ member.department }}</td>
+                    <td>{{ member.designation }}</td>
+                    <td>
+                        <span style="background: #27ae60; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px;">
+                            {{ member.overall_exp or '0' }} yrs
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: #3498db; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px;">
+                            {{ member.teaching_exp_pragati or '0' }} yrs
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: 
+                            {% if member.appointment_type == 'Regular' %}#27ae60
+                            {% elif member.appointment_type == 'Visiting' %}#3498db
+                            {% elif member.appointment_type == 'Adhoc' %}#f39c12
+                            {% else %}#7f8c8d{% endif %}; 
+                            color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px;">
+                            {{ member.appointment_type }}
+                        </span>
+                    </td>
+                    <td>{{ member.email }}</td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <!-- Primary Actions Row -->
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <a href="/faculty/{{ member.id }}" style="background: #8e44ad; color: white; padding: 6px 10px; text-decoration: none; border-radius: 5px; font-size: 11px; flex: 1; text-align: center; font-weight: bold;">👁️ View</a>
+                                <a href="/download_faculty_single/{{ member.id }}" style="background: #27ae60; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 11px; flex: 1; text-align: center;font-weight: bold;">📊 Download</a>
+                            </div>
+                            
+                            <!-- Secondary Actions Row -->
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <a href="/faculty/{{ member.id }}/qualifications" style="background: #3498db; color: white; padding: 5px 8px; text-decoration: none; border-radius: 3px; font-size: 10px; flex: 1; text-align: center;font-weight: bold;">🎓 Qualifications</a>
+                                
+                                <!-- NEW: R&D Button -->
+                                <a href="/faculty/{{ member.id }}/publications" style="background: #9b59b6; color: white; padding: 5px 8px; text-decoration: none; border-radius: 3px; font-size: 10px; flex: 1; text-align: center;font-weight: bold;">🔬 R&D</a>
+                                
+                                {% if user_role in ['IQAC', 'Office'] %}
+                                <a href="/edit_faculty/{{ member.id }}" style="background: #f39c12; color: white; padding: 5px 8px; text-decoration: none; border-radius: 3px; font-size: 10px; flex: 1; text-align: center;font-weight: bold;">✏️ Edit</a>
+                                {% endif %}
+                                
+                                {% if user_role == 'IQAC' %}
+                                <a href="/delete_faculty/{{ member.id }}" style="background: #e74c3c; color: white; padding: 5px 8px; text-decoration: none; border-radius: 3px; font-size: 10px; flex: 1; text-align: center;font-weight: bold;" onclick="return confirm('Delete this faculty?')">🗑️Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #7f8c8d;">
+            {% if user_role in ['Faculty'] %}
+            No Faculty Profile Found
+            {% else %}
+            No Faculty Members Found
+            {% endif %}
+        </h3>
+        <p style="color: #95a5a6;">
+            {% if user_role in ['Faculty'] %}
+            Your faculty profile is not yet created. Please contact administrator.
+            {% else %}
+            {% if request.args.get('search') or request.args.get('department') or request.args.get('appointment_type') or request.args.get('experience') %}
+            No results match your search criteria. Try different filters.
+            {% else %}
+            Start by adding the first faculty member to the system.
+            {% endif %}
+            {% endif %}
+        </p>
+        {% if user_role in ['IQAC', 'Office'] %}
+        <a href="/add_faculty" class="btn" style="background: #3498db; margin-top: 20px;">Add First Faculty</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+<style>
+.faculty-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.faculty-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+.faculty-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+.faculty-table tr:hover {
+    background: #f8f9fa;
+}
+</style>
+{% endblock %}

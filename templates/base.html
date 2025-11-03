@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Portal</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        header { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        nav a { 
+            color: white; 
+            text-decoration: none; 
+            margin-right: 20px; 
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #3498db;
+        }
+        .card { 
+            background: white; 
+            padding: 25px; 
+            margin: 20px 0; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn { 
+            background: #3498db; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        /* ENHANCED FLASH MESSAGE STYLES */
+        .flash-messages {
+            margin: 0 0 20px 0;
+        }
+        .flash-message {
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            border-left: 5px solid;
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        .flash-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left-color: #ffc107;
+        }
+        .flash-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left-color: #17a2b8;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Header user info */
+        .user-info {
+            float: right;
+            color: #ecf0f1;
+        }
+        .user-info a {
+            color: #e74c3c;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .user-info a:hover {
+            color: #c0392b;
+        }
+        /* Department Card Hover Effects */
+.department-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-decoration: none;
+    display: block;
+}
+
+.department-card:hover {
+    transform: translateY(-5px);
+    border-color: #3498db;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-decoration: none;
+    color: white;
+}
+
+/* Grid Layout for Departments */
+.departments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+.field-error {
+    color: #e74c3c !important;
+    font-size: 12px !important;
+    margin-top: 5px !important;
+    display: block !important;
+}
+
+input:invalid, select:invalid, textarea:invalid {
+    border-color: #e74c3c !important;
+}
+
+input:valid, select:valid, textarea:valid {
+    border-color: #27ae60 !important;
+}
+
+/* Required field indicators */
+.required-field::after {
+    content: " *";
+    color: #e74c3c;
+}
+
+/* Form field focus styles */
+input:focus, select:focus, textarea:focus {
+    border-color: #3498db !important;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3) !important;
+    outline: none !important;
+}/* CLICKABLE R&D Dropdown Styles */
+.nav-dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+.dropdown-toggle {
+    position: relative;
+    padding-right: 20px !important;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    min-width: 220px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    z-index: 1000;
+    padding: 10px 0;
+    margin-top: 5px;
+    left: 0;
+    top: 100%;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #2c3e50 !important;
+    text-decoration: none;
+    border-bottom: 1px solid #ecf0f1;
+    margin: 0 !important;
+    font-weight: normal;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #3498db;
+    color: white !important;
+}
+
+.dropdown-menu a:last-child {
+    border-bottom: none;
+}
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <header>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>🎓 Faculty Portal</h1>
+            <nav>
+                <a href="/">Home</a>
+                
+                {% if session.role == 'Faculty' %}
+                <a href="/faculty">👤 My Profile</a>
+                {% else %}
+                <a href="/faculty">Faculty List</a>
+                {% endif %}
+                
+                <!-- CLICKABLE R&D PUBLICATIONS DROPDOWN FOR IQAC/OFFICE -->
+                {% if session.role in ['IQAC', 'Office', 'admin', 'editor', 'Admin', 'Editor'] %}
+                <div class="nav-dropdown">
+                    <a href="javascript:void(0)" class="dropdown-toggle" onclick="toggleRDDropdown()">
+                        🔬 R&D Publications ▼
+                    </a>
+                    <div class="dropdown-menu" id="rdDropdown">
+                        <a href="/rd/publications?type=journal">📚 Journal Publications</a>
+                        <a href="/rd/publications?type=conference">🎤 Conference Papers</a>
+                        <a href="/rd/publications?type=book_chapter">📖 Book Chapters</a>
+                        <a href="/rd/publications?type=patent">⚖️ Patents</a>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- END R&D DROPDOWN -->
+                
+                {% if session.role in ['IQAC', 'Office'] %}
+                <a href="/add_faculty">Add Faculty</a>
+                {% endif %}
+                
+                {% if session.role == 'IQAC' %}
+                <a href="/manage_users" style="background: #e74c3c; padding: 5px 10px; border-radius: 5px; color: white; margin-right: 10px;">Manage Users</a>
+                <a href="/approve_users" style="background: #f39c12; padding: 5px 10px; border-radius: 5px; color: white;">Approve Users</a>
+                {% endif %}
+            </nav>
+        </div>
+        {% if session.logged_in %}
+        <div class="user-info">
+            👤 <strong>{{ session.username }}</strong> ({{ session.role }})
+            <a href="/logout">🚪 Logout</a>
+        </div>
+        {% endif %}
+    </div>
+</header>
+        <!-- ENHANCED FLASH MESSAGES SECTION -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}" id="flash-{{ loop.index }}">
+                            {% if category == 'success' %}✅ 
+                            {% elif category == 'error' %}❌ 
+                            {% elif category == 'warning' %}⚠️ 
+                            {% elif category == 'info' %}ℹ️ 
+                            {% else %}📢{% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Auto-hide flash messages after 5 seconds -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            
+            flashMessages.forEach(message => {
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    message.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (message.parentElement) {
+                            message.parentElement.removeChild(message);
+                        }
+                    }, 500); // Wait for fade-out animation to complete
+                }, 5000); // 5 seconds
+                
+                // Also allow manual close by clicking
+                message.addEventListener('click', function() {
+                    this.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (this.parentElement) {
+                            this.parentElement.removeChild(this);
+                        }
+                    }, 500);
+                });
+            });
+        });
+        // R&D Dropdown click functionality
+function toggleRDDropdown() {
+    const dropdown = document.getElementById('rdDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('rdDropdown');
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    
+    if (dropdown && dropdownToggle) {
+        if (!dropdown.contains(event.target) && !dropdownToggle.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    }
+});
+
+// Close dropdown when a menu item is clicked
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdownLinks = document.querySelectorAll('.dropdown-menu a');
+    dropdownLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const dropdown = document.getElementById('rdDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        });
+    });
+});
+
+// Auto-hide flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const flashMessages = document.querySelectorAll('.flash-message');
+    
+    flashMessages.forEach(message => {
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            message.classList.add('fade-out');
+            setTimeout(() => {
+                if (message.parentElement) {
+                    message.parentElement.removeChild(message);
+                }
+            }, 500); // Wait for fade-out animation to complete
+        }, 5000); // 5 seconds
+        
+        // Also allow manual close by clicking
+        message.addEventListener('click', function() {
+            this.classList.add('fade-out');
+            setTimeout(() => {
+                if (this.parentElement) {
+                    this.parentElement.removeChild(this);
+                }
+            }, 500);
+        });
+    });
+});
+    </script>
+</body>
+</html>

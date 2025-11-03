@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>📚 Journal Publication Details</h2>
+        <a href="/faculty/{{ journal.faculty_id }}/publications" class="btn" style="background: #3498db;">← Back to R&D</a>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 25px; border-radius: 10px;">
+        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">{{ journal.paper_title_apa }}</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div>
+                <h4>Publication Information</h4>
+                <p><strong>Journal:</strong> {{ journal.journal_name }}</p>
+                <p><strong>Volume & Issue:</strong> {{ journal.volume_issue or 'N/A' }}</p>
+                <p><strong>Pages:</strong> {{ journal.page_numbers or 'N/A' }}</p>
+                <p><strong>Year:</strong> {{ journal.year_of_publication }}</p>
+                <p><strong>ISSN:</strong> {{ journal.issn_number or 'N/A' }}</p>
+                <p><strong>DOI:</strong> {{ journal.doi or 'N/A' }}</p>
+            </div>
+            
+            <div>
+                <h4>Authors & Indexing</h4>
+                <p><strong>First Author:</strong> {{ journal.first_author }}</p>
+                <p><strong>Corresponding Author:</strong> {{ journal.corresponding_author }}</p>
+                <p><strong>Other Authors:</strong> {{ journal.other_authors or 'None' }}</p>
+                <p><strong>Faculty Position:</strong> {{ journal.faculty_author_position }}</p>
+                <p><strong>Indexing:</strong> {{ journal.indexing or 'N/A' }}</p>
+                <p><strong>Quartile:</strong> {{ journal.quartile or 'N/A' }}</p>
+                <p><strong>Impact Factor:</strong> {{ "%.3f"|format(journal.impact_factor) if journal.impact_factor else 'N/A' }}</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <h4>Additional Information</h4>
+            <p><strong>Publisher:</strong> {{ journal.publisher or 'N/A' }}</p>
+            <p><strong>Funding Agency:</strong> {{ journal.funding_agency or 'N/A' }}</p>
+            <p><strong>Remarks:</strong> {{ journal.remarks or 'N/A' }}</p>
+            {% if journal.journal_link %}
+            <p><strong>Journal Link:</strong> <a href="{{ journal.journal_link }}" target="_blank">{{ journal.journal_link }}</a></p>
+            {% endif %}
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 5px;">
+            <p><strong>Faculty:</strong> {{ journal.name_ssc }} ({{ journal.faculty_department }})</p>
+            <p><strong>Department:</strong> {{ journal.department }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

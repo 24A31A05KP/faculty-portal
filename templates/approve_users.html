@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>👥 User Approval Queue</h2>
+        <a href="/manage_users" class="btn" style="background: #3498db;">← Back to User Management</a>
+    </div>
+
+    {% if pending_users %}
+    <div class="table-container">
+        <table class="faculty-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Requested Role</th>
+                    <th>Registration Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in pending_users %}
+                <tr>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span style="background: 
+                            {% if user.role == 'admin' %}#e74c3c
+                            {% elif user.role == 'editor' %}#f39c12
+                            {% else %}#3498db{% endif %}; 
+                            color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                            {{ user.role|title }}
+                        </span>
+                    </td>
+                    <td>{{ user.created_at }}</td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <a href="/approve_user/{{ user.id }}" style="background: #27ae60; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">✅ Approve</a>
+                            <a href="/reject_user/{{ user.id }}" style="background: #e74c3c; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;" onclick="return confirm('Reject this user registration?')">❌ Reject</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #7f8c8d;">✅ No Pending User Approvals</h3>
+        <p style="color: #95a5a6;">All users are approved. New registrations will appear here.</p>
+        <a href="/manage_users" class="btn" style="background: #3498db; margin-top: 10px;">View All Users</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.faculty-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.faculty-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+.faculty-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+.faculty-table tr:hover {
+    background: #f8f9fa;
+}
+</style>
+{% endblock %}
