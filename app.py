@@ -7,6 +7,7 @@ import mysql.connector
 import openpyxl
 from openpyxl.styles import Font, Alignment
 from utils import get_department_stats, get_gender_stats, get_appointment_stats, get_experience_stats, get_designation_stats
+from urllib.parse import urlparse
 
 # Add these constants and functions at the top
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'}
@@ -49,7 +50,18 @@ def allowed_file(filename):
 app = Flask(__name__)
 app.secret_key = 'faculty-secret-key'
 def get_db_connection():
-    # Works both locally and on Railway!
+    url = os.environ.get('MYSQL_URL')
+    if url:
+        # Example: mysql://user:pass@host:port/database
+        p = urlparse(url)
+        return mysql.connector.connect(
+            host=p.hostname,
+            user=p.username,
+            password=p.password,
+            database=p.path.lstrip('/'),
+            port=p.port or 3306
+        )
+    # Fallback for local development
     return mysql.connector.connect(
         host=os.environ.get('MYSQLHOST', 'localhost'),
         user=os.environ.get('MYSQLUSER', 'your_username'),
