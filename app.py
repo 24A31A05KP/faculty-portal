@@ -4,6 +4,7 @@ import os
 import io
 from werkzeug.utils import secure_filename
 import mysql.connector
+from mysql.connector import Error, InterfaceError  # ← ADD THIS IMPORT
 import openpyxl
 from openpyxl.styles import Font, Alignment
 from utils import get_department_stats, get_gender_stats, get_appointment_stats, get_experience_stats, get_designation_stats
