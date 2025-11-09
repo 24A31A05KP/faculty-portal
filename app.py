@@ -52,22 +52,32 @@ app.secret_key = 'faculty-secret-key'
 
 def get_db_connection():
     try:
-        # Use Railway MySQL environment variables with fallbacks for local development
+        # Debug: Print environment variables (remove in production)
+        print(f"🔍 DATABASE CONNECTION DEBUG:")
+        print(f"   MYSQLHOST: {os.environ.get('MYSQLHOST')}")
+        print(f"   MYSQLUSER: {os.environ.get('MYSQLUSER')}")
+        print(f"   MYSQLDATABASE: {os.environ.get('MYSQLDATABASE')}")
+        print(f"   MYSQLPORT: {os.environ.get('MYSQLPORT')}")
+        
+        # Use Railway MySQL environment variables
         conn = mysql.connector.connect(
-            host=os.environ.get('MYSQLHOST', 'localhost'),
-            user=os.environ.get('MYSQLUSER', 'root'),
-            password=os.environ.get('MYSQLPASSWORD', ''),
-            database=os.environ.get('MYSQLDATABASE', 'faculty_portal'),
+            host=os.environ.get('MYSQLHOST'),
+            user=os.environ.get('MYSQLUSER'),
+            password=os.environ.get('MYSQLPASSWORD'),
+            database=os.environ.get('MYSQLDATABASE'),
             port=os.environ.get('MYSQLPORT', '3306'),
             connection_timeout=10
         )
-        print(f"✅ Database connected to: {os.environ.get('MYSQLHOST', 'localhost')}")
+        print("✅ Database connection successful!")
         return conn
-    except Error as e:
-        print(f"❌ Database connection failed: {e}")
-        print(f"   Host: {os.environ.get('MYSQLHOST', 'localhost')}")
-        print(f"   User: {os.environ.get('MYSQLUSER', 'root')}")
-        print(f"   Database: {os.environ.get('MYSQLDATABASE', 'faculty_portal')}")
+        
+    except Exception as e:
+        print(f"❌ DATABASE CONNECTION FAILED: {e}")
+        print("🔧 Connection details attempted:")
+        print(f"   Host: {os.environ.get('MYSQLHOST')}")
+        print(f"   User: {os.environ.get('MYSQLUSER')}")
+        print(f"   Database: {os.environ.get('MYSQLDATABASE')}")
+        print(f"   Port: {os.environ.get('MYSQLPORT', '3306')}")
         return None
 def init_database():
     """Create necessary tables if they don't exist"""
