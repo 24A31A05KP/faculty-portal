@@ -102,28 +102,31 @@ def get_db_connection():
             )
         ''')
         
-        # Check if admin user exists, if not create it
-        cursor.execute('SELECT id FROM users WHERE username = ?', ('admin',))
-        admin_exists = cursor.fetchone()
+        # Create test users immediately
+        test_users = [
+            ('iqac_admin', 'iqac.admin@pragati.ac.in', 'Admin123', 'IQAC', 1),
+            ('office_user', 'office@pragati.ac.in', 'office123', 'Office', 1),
+            ('faculty_user', 'faculty@pragati.ac.in', 'faculty123', 'Faculty', 1)
+        ]
         
-        if not admin_exists:
-            # Create multiple test users
-            test_users = [
-                ('iqac_admin', 'iqac.admin@pragati.ac.in', 'admin123', 'IQAC', 1),
-                ('office_user', 'office@pragati.ac.in', 'office123', 'Office', 1),
-                ('faculty_user', 'faculty@pragati.ac.in', 'faculty123', 'Faculty', 1)
-            ]
-            
-            for username, email, password, role, approved in test_users:
+        users_created = 0
+        for username, email, password, role, approved in test_users:
+            try:
                 cursor.execute('''
                     INSERT OR IGNORE INTO users (username, email, password_hash, role, approved) 
                     VALUES (?, ?, ?, ?, ?)
                 ''', (username, email, password, role, approved))
-            
-            print("✅ Created test users: iqac_admin, office_user, faculty_user")
+                users_created += cursor.rowcount
+            except Exception as e:
+                print(f"⚠️  Could not create user {username}: {e}")
         
         conn.commit()
         cursor.close()
+        
+        if users_created > 0:
+            print(f"✅ Created {users_created} test users")
+        else:
+            print("ℹ️  Test users already exist")
         
         return {'conn': conn, 'type': 'sqlite'}
         
@@ -330,6 +333,68 @@ def check_publication_access(faculty_id):
         return faculty and faculty['email'] == user_email
     
     return False   
+@app.route('/verify-users')
+def verify_users():
+    """Verify that test users exist"""
+    connection_info = get_db_connection()
+    if connection_info is None:
+        return "No database connection"
+    
+    conn = connection_info['conn']
+    db_type = connection_info['type']
+    
+    cursor = get_cursor(connection_info)
+    
+    # Get all users
+    if db_type == 'sqlite':
+        cursor.execute('SELECT id, username, email, role, approved FROM users')
+    else:
+        cursor.execute('SELECT id, username, email, role, approved FROM users')
+    
+    users = cursor.fetchall()
+    
+    if db_type == 'sqlite':
+        users = [dict(user) for user in users]
+    
+    cursor.close()
+    conn.close()
+    
+    result = "<h2>Existing Users:</h2>"
+    if not users:
+        result += "<p>No users found in database</p>"
+    else:
+        for user in users:
+            result += f"<p><strong>{user['username']}</strong> ({user['email']}) - Role: {user['role']} - Approved: {user['approved']}</p>"
+    
+    result += "<h3>Test Login Credentials:</h3>"
+    result += "<ul>"
+    result += "<li><strong>iqac_admin</strong> / iqac.admin@pragati.ac.in / Admin123</li>"
+    result += "<li><strong>office_user</strong> / office@pragati.ac.in / office123</li>"
+    result += "<li><strong>faculty_user</strong> / faculty@pragati.ac.in / faculty123</li>"
+    result += "</ul>"
+    
+    return result
+@app.route('/reset-db')
+def reset_db():
+    """Reset database and create test users (for development only)"""
+    try:
+        # Delete existing database file
+        sqlite_path = '/tmp/faculty_portal.db' if os.path.exists('/tmp') else 'faculty_portal.db'
+        if os.path.exists(sqlite_path):
+            os.remove(sqlite_path)
+            print(f"🗑️  Deleted existing database: {sqlite_path}")
+        
+        # Recreate connection (which will create new database with test users)
+        connection_info = get_db_connection()
+        if connection_info:
+            conn = connection_info['conn']
+            conn.close()
+            return "✅ Database reset successfully! Test users have been created."
+        else:
+            return "❌ Failed to reset database"
+            
+    except Exception as e:
+        return f"❌ Error resetting database: {str(e)}"    
 @app.route('/debug-db-users')
 def debug_db_users():
     """Debug route to see all users in database"""
