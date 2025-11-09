@@ -3,6 +3,7 @@ import datetime
 import os
 import io
 from werkzeug.utils import secure_filename
+import sqlite3
 import mysql.connector
 from mysql.connector import Error, InterfaceError  # ← ADD THIS IMPORT
 import openpyxl
@@ -51,33 +52,75 @@ app = Flask(__name__)
 app.secret_key = 'faculty-secret-key'
 
 def get_db_connection():
+    # Try MySQL first (Railway)
     try:
-        # Debug: Print environment variables (remove in production)
-        print(f"🔍 DATABASE CONNECTION DEBUG:")
-        print(f"   MYSQLHOST: {os.environ.get('MYSQLHOST')}")
-        print(f"   MYSQLUSER: {os.environ.get('MYSQLUSER')}")
-        print(f"   MYSQLDATABASE: {os.environ.get('MYSQLDATABASE')}")
-        print(f"   MYSQLPORT: {os.environ.get('MYSQLPORT')}")
+        mysql_host = os.environ.get('MYSQLHOST')
+        mysql_user = os.environ.get('MYSQLUSER')
+        mysql_password = os.environ.get('MYSQLPASSWORD')
+        mysql_database = os.environ.get('MYSQLDATABASE')
         
-        # Use Railway MySQL environment variables
-        conn = mysql.connector.connect(
-            host=os.environ.get('MYSQLHOST'),
-            user=os.environ.get('MYSQLUSER'),
-            password=os.environ.get('MYSQLPASSWORD'),
-            database=os.environ.get('MYSQLDATABASE'),
-            port=os.environ.get('MYSQLPORT', '3306'),
-            connection_timeout=10
-        )
-        print("✅ Database connection successful!")
+        print(f"🔍 Checking MySQL environment variables:")
+        print(f"   MYSQLHOST: {mysql_host}")
+        print(f"   MYSQLUSER: {mysql_user}")
+        print(f"   MYSQLDATABASE: {mysql_database}")
+        print(f"   MYSQLPASSWORD: {'[SET]' if mysql_password else '[NOT SET]'}")
+        
+        # Only try MySQL if all required variables are present
+        if all([mysql_host, mysql_user, mysql_password, mysql_database]):
+            conn = mysql.connector.connect(
+                host=mysql_host,
+                user=mysql_user,
+                password=mysql_password,
+                database=mysql_database,
+                port=os.environ.get('MYSQLPORT', '3306'),
+                connection_timeout=10
+            )
+            print("✅ Connected to MySQL database")
+            return conn
+        else:
+            print("⚠️  MySQL environment variables not complete, using SQLite fallback")
+            
+    except Exception as e:
+        print(f"❌ MySQL connection failed: {e}")
+    
+    # Fallback to SQLite for development
+    try:
+        # Create SQLite database file
+        sqlite_path = '/tmp/faculty_portal.db' if os.path.exists('/tmp') else 'faculty_portal.db'
+        conn = sqlite3.connect(sqlite_path)
+        conn.row_factory = sqlite3.Row
+        print("✅ Connected to SQLite database (fallback)")
+        
+        # Create tables if they don't exist
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT DEFAULT 'faculty',
+                approved BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP NULL,
+                full_name TEXT,
+                department TEXT
+            )
+        ''')
+        
+        # Add a default admin user for testing
+        cursor.execute('''
+            INSERT OR IGNORE INTO users (username, email, password_hash, role, approved) 
+            VALUES (?, ?, ?, ?, ?)
+        ''', ('admin', 'admin@example.com', 'admin123', 'IQAC', 1))
+        
+        conn.commit()
+        cursor.close()
+        
         return conn
         
     except Exception as e:
-        print(f"❌ DATABASE CONNECTION FAILED: {e}")
-        print("🔧 Connection details attempted:")
-        print(f"   Host: {os.environ.get('MYSQLHOST')}")
-        print(f"   User: {os.environ.get('MYSQLUSER')}")
-        print(f"   Database: {os.environ.get('MYSQLDATABASE')}")
-        print(f"   Port: {os.environ.get('MYSQLPORT', '3306')}")
+        print(f"❌ SQLite connection also failed: {e}")
         return None
 def init_database():
     """Create necessary tables if they don't exist"""
