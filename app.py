@@ -50,24 +50,11 @@ def allowed_file(filename):
 app = Flask(__name__)
 app.secret_key = 'faculty-secret-key'
 def get_db_connection():
-    url = os.environ.get('MYSQL_URL')
-    if url:
-        # Example: mysql://user:pass@host:port/database
-        p = urlparse(url)
-        return mysql.connector.connect(
-            host=p.hostname,
-            user=p.username,
-            password=p.password,
-            database=p.path.lstrip('/'),
-            port=p.port or 3306
-        )
-    # Fallback for local development
     return mysql.connector.connect(
-        host=os.environ.get('MYSQLHOST', 'localhost'),
-        user=os.environ.get('MYSQLUSER', 'your_username'),
-        password=os.environ.get('MYSQLPASSWORD', 'your_password'),
-        database=os.environ.get('MYSQLDATABASE', 'faculty_portal'),
-        port=int(os.environ.get('MYSQLPORT', 3306)),
+        host='localhost',
+        user='root',    # ✅ Safe placeholder
+        password='Root123!', # ✅ Safe placeholder  
+        database='faculty_portal'
     )
 def login_required(f):
     """Decorator to require login for routes"""
