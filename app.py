@@ -122,7 +122,34 @@ def get_db_connection():
     except Exception as e:
         print(f"❌ SQLite connection also failed: {e}")
         return None
-
+def execute_query(connection_info, query, params=None):
+    """Execute query and return results as dictionaries"""
+    if connection_info is None:
+        return []
+    
+    conn = connection_info['conn']
+    db_type = connection_info['type']
+    
+    try:
+        cursor = get_cursor(connection_info)
+        
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+            
+        results = cursor.fetchall()
+        
+        # Convert to list of dictionaries for consistent access
+        if db_type == 'sqlite':
+            results = [dict(row) for row in results]
+        
+        cursor.close()
+        return results
+        
+    except Exception as e:
+        print(f"❌ Query execution failed: {e}")
+        return []
 def get_cursor(connection_info):
     """Get appropriate cursor based on database type"""
     if connection_info is None:
