@@ -365,6 +365,7 @@ def login():
         
         connection_info = get_db_connection()
         if connection_info is None:
+            print("❌ LOGIN FAILED: No database connection")
             flash('❌ Database connection failed. Please try again later.', 'error')
             return render_template('login.html')
         
@@ -376,15 +377,14 @@ def login():
             
             # Use appropriate query based on database type
             if db_type == 'sqlite':
-                # SQLite query
                 cursor.execute('SELECT * FROM users WHERE username = ? AND email = ? AND password_hash = ?', 
                               (username, email, password))
             else:
-                # MySQL query
                 cursor.execute('SELECT * FROM users WHERE username = %s AND email = %s AND password_hash = %s', 
                               (username, email, password))
             
             user = cursor.fetchone()
+            print(f"🔍 USER QUERY RESULT: {user}")
             
             if user:
                 # Convert to dictionary for consistent access
@@ -393,7 +393,10 @@ def login():
                 else:
                     user_dict = user
                 
+                print(f"🔍 USER FOUND: {user_dict}")
+                
                 if not user_dict['approved']:
+                    print(f"🔍 LOGIN FAILED: User not approved")
                     cursor.close()
                     conn.close()
                     flash('⏳ Account pending admin approval.', 'error')
@@ -406,6 +409,8 @@ def login():
                 session['role'] = user_dict['role']
                 session['logged_in'] = True
                 
+                print(f"🔍 SESSION SET: {dict(session)}")
+                
                 # Update last login
                 if db_type == 'sqlite':
                     cursor.execute('UPDATE users SET last_login = datetime("now") WHERE id = ?', (user_dict['id'],))
@@ -416,10 +421,11 @@ def login():
                 cursor.close()
                 conn.close()
                 
+                print("🔍 LOGIN SUCCESS: Redirecting to /")
                 flash(f'✅ Welcome back, {user_dict["username"]}!', 'success')
                 return redirect('/')
             else:
-                # Handle failed login
+                print("🔍 LOGIN FAILED: No user found or invalid credentials")
                 cursor.close()
                 conn.close()
                 flash('❌ Invalid credentials! Please check username, email and password.', 'error')
@@ -428,6 +434,8 @@ def login():
                 
         except Exception as e:
             print(f"🔍 LOGIN ERROR: {str(e)}")
+            import traceback
+            print(f"🔍 TRACEBACK: {traceback.format_exc()}")
             if 'conn' in locals():
                 cursor.close()
                 conn.close()
@@ -518,7 +526,15 @@ def register():
     
     print("🔍 REGISTRATION DEBUG: GET request for registration form")
     return render_template('register.html', form_data={})
-
+@app.route('/debug-session')
+def debug_session():
+    """Debug session information"""
+    return jsonify({
+        'session_data': dict(session),
+        'logged_in': session.get('logged_in', False),
+        'username': session.get('username'),
+        'user_id': session.get('user_id')
+    })
 @app.route('/')
 @login_required
 def index():
