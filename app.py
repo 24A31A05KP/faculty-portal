@@ -76,7 +76,7 @@ def get_db_connection():
                 connection_timeout=10
             )
             print("✅ Connected to MySQL database")
-            return conn
+            return {'conn': conn, 'type': 'mysql'}
         else:
             print("⚠️  MySQL environment variables not complete, using SQLite fallback")
             
@@ -117,11 +117,24 @@ def get_db_connection():
         conn.commit()
         cursor.close()
         
-        return conn
+        return {'conn': conn, 'type': 'sqlite'}
         
     except Exception as e:
         print(f"❌ SQLite connection also failed: {e}")
         return None
+
+def get_cursor(connection_info):
+    """Get appropriate cursor based on database type"""
+    if connection_info is None:
+        return None
+        
+    conn = connection_info['conn']
+    db_type = connection_info['type']
+    
+    if db_type == 'mysql':
+        return conn.cursor(dictionary=True)
+    else:  # sqlite
+        return conn.cursor()
 def init_database():
     """Create necessary tables if they don't exist"""
     try:
