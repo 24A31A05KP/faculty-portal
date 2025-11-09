@@ -3,5 +3,6 @@ Flask==2.3.3
 mysql-connector-python==8.1.0
 Werkzeug==2.3.7
 # Add these for enhanced functionality:
+openpyxl==3.1.2
 python-dotenv==1.0.0    # For environment variables
 email-validator==2.0.0  # For email validation
