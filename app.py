@@ -7,8 +7,7 @@ import mysql.connector
 import openpyxl
 from openpyxl.styles import Font, Alignment
 from utils import get_department_stats, get_gender_stats, get_appointment_stats, get_experience_stats, get_designation_stats
-from urllib.parse import urlparse
-app = Flask(__name__)
+
 # Add these constants and functions at the top
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
@@ -49,6 +48,7 @@ def allowed_file(filename):
 
 app = Flask(__name__)
 app.secret_key = 'faculty-secret-key'
+
 def get_db_connection():
     return mysql.connector.connect(
         host='localhost',
@@ -56,6 +56,7 @@ def get_db_connection():
         password='Root123!', # ✅ Safe placeholder  
         database='faculty_portal'
     )
+
 def login_required(f):
     """Decorator to require login for routes"""
     from functools import wraps
@@ -3926,43 +3927,7 @@ def rd_download_excel():
         
     except Exception as e:
         flash(f'❌ Error generating Excel file: {str(e)}', 'error')
-        return redirect(f'/rd/publications?type={publication_type}')   
-@app.route('/debug-db')
-def debug_db():
-    """Debug database connection"""
-    try:
-        env_info = {
-            'MYSQLHOST': os.environ.get('MYSQLHOST'),
-            'MYSQLUSER': os.environ.get('MYSQLUSER'),
-            'MYSQLDATABASE': os.environ.get('MYSQLDATABASE'),
-            'MYSQLPORT': os.environ.get('MYSQLPORT'),
-            'MYSQL_URL': os.environ.get('MYSQL_URL')[:50] + '...' if os.environ.get('MYSQL_URL') else None
-        }
-        
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT 1 as test")
-            result = cursor.fetchone()
-            cursor.close()
-            conn.close()
-            return jsonify({
-                "status": "success", 
-                "database_test": result,
-                "environment": env_info
-            })
-        else:
-            return jsonify({
-                "status": "error", 
-                "message": "Database connection failed",
-                "environment": env_info
-            })
-    except Exception as e:
-        return jsonify({
-            "status": "error", 
-            "message": str(e),
-            "environment": env_info
-        })                 
+        return redirect(f'/rd/publications?type={publication_type}')            
 if __name__ == '__main__':
-   port = int(os.environ.get("PORT", 5000))
-   app.run(host='0.0.0.0', port=port)
+    print("🚀 Faculty Portal Starting...")
+    app.run(debug=True, host='0.0.0.0', port=5000)
