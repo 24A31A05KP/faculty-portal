@@ -3930,7 +3930,7 @@ def rd_download_excel():
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"rd_{publication_type}_publications_{timestamp}.xlsx"
-        
+    
         return send_file(
             excel_buffer,
             as_attachment=True,
