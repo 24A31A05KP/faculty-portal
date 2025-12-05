@@ -42,3 +42,4 @@ Thumbs.db
 
 # Uploads (don't upload user files to GitHub)
 static/uploads/
+.vercel
