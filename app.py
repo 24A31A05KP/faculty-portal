@@ -50,13 +50,18 @@ app = Flask(__name__)
 app.secret_key = 'faculty-secret-key'
 
 def get_db_connection():
-    return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='Root123!',
-        database='faculty_portal'
+    conn = mysql.connector.connect(
+        host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT", "3306")),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        # If your provider requires TLS (PlanetScale, many managed MySQLs):
+        ssl_disabled=False  # set to False to allow TLS; omit/adjust if your provider gives specific CA
+        # For providers that give a CA file URL/path, you can add:
+        # ssl_ca="/etc/ssl/certs/ca-certificates.crt"
     )
-
+    return conn
 def login_required(f):
     """Decorator to require login for routes"""
     from functools import wraps
